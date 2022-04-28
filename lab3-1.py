@@ -203,5 +203,5 @@ class Problema:
 
 
 p = Problema()
-p.citeste("input3-1.in")
+p.citeste("lab3-1.in")
 p.rezolva()
