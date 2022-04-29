@@ -247,7 +247,10 @@ class Harta:
                     distanta = pisica.distanta_coords_squared(pisica.x + deplasament[0], pisica.y + deplasament[1])
                     if distanta < distanta_best:
                         deplasament_best = deplasament
-                        distanta = distanta_best
+                        distanta_best = distanta_best
+            # Permite pisicii sa stea pe loc daca nu are nicio miscare validas
+            if deplasament_best is None:
+                deplasament_best = (0, 0)
 
             # Actualizam harta, mutand fizic pisica
             self.muta_pisica(index_pisica, deplasament_best)
