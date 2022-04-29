@@ -206,7 +206,7 @@ class Harta:
         :param deplasament: cum sa isi modifice pozitia
         """
 
-        pisica = self.soareci[index_pisica]
+        pisica = self.pisici[index_pisica]
 
         # Actualizeaza pozitia veche de pe harta
         # Dupa ce pleaca o pisica, in locul ei vechi sigur ramane spatiu liber
@@ -303,9 +303,14 @@ class NodParcurgere:
                 lista_deplasamente.appendleft(curr)
                 break
 
+            adaugat_deplasament = False
             for deplasament in [(-1, 0), (0, 1), (1, 0), (0, -1)]:
                 if self.nod.harta.sunt_mutari_valide_soarece(curr + [deplasament]):
                     lista_deplasamente.append(curr + [deplasament])
+                    adaugat_deplasament = True
+            # Soarecele de la indicele curent nu a putut fi mutat in nicio directie => sta pe loc.
+            if not adaugat_deplasament:
+                lista_deplasamente.append(curr + [(0, 0)])
 
         mutari = []
         for deplasamente in lista_deplasamente:
