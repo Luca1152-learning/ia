@@ -5,6 +5,13 @@ from typing import List, Tuple
 
 class Punct2D:
     def __init__(self, x: int, y: int):
+        """
+        Initializeaza un obiect de tip Punct2D.
+
+        :param x: coordonata X a punctului
+        :param y: coordonata Y a punctului
+        """
+
         self.x = x
         self.y = y
 
@@ -16,10 +23,23 @@ class Punct2D:
 
 class Harta:
     def __init__(self, harta: List[List[str]]):
+        """
+        Initializeaza un obiect de tip Harta.
+
+        :param harta: matricea cu caractere, citita ca input
+        """
+
         self.harta = harta
         self.pisici, self.soareci, self.ascunzisuri, self.iesiri = self.gaseste_puncte_speciale()
 
     def gaseste_puncte_speciale(self) -> Tuple[List[Punct2D], List[Punct2D], List[Punct2D], List[Punct2D]]:
+        """
+        Identifica punctele speciale din harta (din matricea cu caractere) - pisicile, soarecii, asunzisurile
+        libere si iesirile.
+
+        :return: Un tuplu cu (pisici, soareci, ascunzisuri_libere, iesiri).
+        """
+
         # Stocheaza pisicile + soarecii in dictionare pe masura ce sunt gasiti (fiind sortati ulterior)
         pisici, soareci = {}, {}
         ascunzisuri_libere, iesiri = [], []
@@ -43,13 +63,36 @@ class Harta:
         return pisici, soareci, ascunzisuri_libere, iesiri
 
     def muta_soarece(self, index_soarece: int, deplasament: Tuple[int, int]):
+        """
+        Muta un soarece pe harta, actualizand harta (=matricea de caractere) corect.
+
+        :param index_soarece: al catalea soarece sa fie mutat
+        :param deplasament: cum sa isi modifice pozitia
+        """
+
         if self.e_mutare_valida_soarece(index_soarece, deplasament):
             pass  # TODO
 
     def e_celula_pe_harta(self, x: int, y: int):
+        """
+        Verifica daca coordonatele date se afla pe harta (si nu sunt in exteriorul ei).
+
+        :param x: coordonata X a punctului verificat
+        :param y: coordonata Y a punctului verificat
+        :return: True daca punctul e pe harta, False altfel
+        """
+
         return (0 <= y < len(self.harta)) and (0 <= x < len(self.harta[y]))
 
     def e_celula_accesibila_soarece(self, x: int, y: int):
+        """
+        Verifica daca un soarece se poate muta pe celula de la pozitia data.
+
+        :param x: coordonata X a punctului verificat
+        :param y: coordonata Y a punctului verificat
+        :return: True daca un soarece se poate muta in punctul dat, False altfel
+        """
+
         if not self.e_celula_pe_harta(x, y):
             return False
 
@@ -57,10 +100,34 @@ class Harta:
         return celula == "." or celula == "E" or celula == "@"
 
     def e_mutare_valida_soarece(self, index_soarece: int, deplasament: Tuple[int, int]) -> bool:
+        """
+        Verifica daca un soarece poate fi mutat pe harta, aplicandu-se deplasamentul dat. De exemplu,
+        nu poti muta un soarece in afara hartii / pe o celula pe care e deja un soarece / pe un obstacol / etc.
+
+        :param index_soarece: al catalea soarece sa fie mutat
+        :param deplasament: cum sa isi modifice pozitia
+        :return: True daca soarecele poate fi mutat cu deplasamentul dat, False altfel
+        """
+
         soarece = self.soareci[index_soarece]
         return self.e_celula_accesibila_soarece(soarece.x + deplasament[0], soarece.y + deplasament[1])
 
+    def sunt_mutari_valide_soarece(self, deplasamente: List[Tuple[int, int]]):
+        """
+        Verifica daca secventa de deplasamente poate fi aplicata pe soarecii cu indicii [0, len(deplasamente)].
+        Astfel, dupa fiecare mutare valida, harta e modificata corespunzator si se continua cu urmatoarea mutare.
+        La final, harta e resetata la starea initiala (aplicandu-se invers miscarile).
+
+        :param deplasamente: lista cu deplasamentele care sa fie aplicate soarecilor cu indicii [0, len(deplasamente)]
+        :return: True daca secventa de deplasamente e valida, False altfel
+        """
+        pass
+
     def muta_pisici(self):
+        """
+        Muta pisicile, una cate una, catre pozitia optima acestora (folosind regulile date in enuntul problemei).
+        """
+
         # TODO
 
         pass
@@ -115,12 +182,9 @@ class NodParcurgere:
                 lista_deplasamente.appendleft(curr)
                 break
 
-            index_soarece_deplasat = len(curr)
             for deplasament in [(-1, 0), (0, 1), (1, 0), (0, -1)]:
-                # TODO: nu genereaza toate miscarile, deoarece sunt verificate individual, nu ca secventa
-                if self.nod.harta.e_mutare_valida_soarece(index_soarece_deplasat, deplasament):
-                    lista_deplasamente.append(copy.deepcopy(curr) + [deplasament])
-
+                if self.nod.harta.sunt_mutari_valide_soarece(curr + [deplasament]):
+                    lista_deplasamente.append(curr + [deplasament])
 
         print(len(lista_deplasamente), lista_deplasamente)
         mutari = []
