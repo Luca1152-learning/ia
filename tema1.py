@@ -237,6 +237,7 @@ class Harta:
                 if distanta < distanta_closest_soarece:
                     index_closest_soarece = index_soarece
                     distanta_closest_soarece = distanta
+            closest_soarece = self.soareci[index_closest_soarece]
 
             # Gasim casuta valida vecina apropiata de cel mai apropiat soarece
             deplasament_best = None
@@ -244,7 +245,9 @@ class Harta:
             deplasamente = [(0, -1), (-1, -1), (-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1)]
             for deplasament in deplasamente:
                 if self.e_mutare_valida_pisica(index_pisica, deplasament):
-                    distanta = pisica.distanta_coords_squared(pisica.x + deplasament[0], pisica.y + deplasament[1])
+                    distanta = closest_soarece.distanta_coords_squared(
+                        pisica.x + deplasament[0], pisica.y + deplasament[1]
+                    )
                     if distanta < distanta_best:
                         deplasament_best = deplasament
                         distanta_best = distanta_best
