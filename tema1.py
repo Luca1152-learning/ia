@@ -230,14 +230,20 @@ class Harta:
 
         for index_pisica, pisica in enumerate(self.pisici):
             # Gasim cel mai apropiat soarece de pisica
-            index_closest_soarece = 0
-            distanta_closest_soarece = pisica.distanta_squared(self.soareci[0])
-            for index_soarece in range(1, len(self.soareci)):
+            # index_closest_soarece = 0
+            # distanta_closest_soarece = pisica.distanta_squared(self.soareci[0])
+            index_closest_soarece = -1
+            distanta_closest_soarece = float("inf")
+            for index_soarece, soarece in enumerate(self.soareci):
+                # Daca soarecele e ascuns, ignora-l
+                if self.harta[soarece.y][soarece.x].startswith("S"):
+                    continue
+
                 distanta = pisica.distanta_squared(self.soareci[index_soarece])
                 if distanta < distanta_closest_soarece:
                     index_closest_soarece = index_soarece
                     distanta_closest_soarece = distanta
-            closest_soarece = self.soareci[index_closest_soarece]
+            closest_soarece = self.soareci[index_closest_soarece] if index_closest_soarece != -1 else None
 
             # Gasim casuta valida vecina apropiata de cel mai apropiat soarece
             deplasament_best = None
@@ -245,13 +251,20 @@ class Harta:
             deplasamente = [(0, -1), (-1, -1), (-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1)]
             for deplasament in deplasamente:
                 if self.e_mutare_valida_pisica(index_pisica, deplasament):
+                    # Nu exista niciun soarece la care se poate ajunge (neexistand soareci / toti fiind ascunsi).
+                    # Atunci orice mutare valida e la fel de buna (pisicile ne mai vazand soarecii ascunsi).
+                    # Nu putem sa stam pe loc daca exista miscari valide.
+                    if closest_soarece is None:
+                        deplasament_best = deplasament
+                        break
+
                     distanta = closest_soarece.distanta_coords_squared(
                         pisica.x + deplasament[0], pisica.y + deplasament[1]
                     )
                     if distanta < distanta_best:
                         deplasament_best = deplasament
                         distanta_best = distanta_best
-            # Permite pisicii sa stea pe loc daca nu are nicio miscare validas
+            # Permite pisicii sa stea pe loc daca nu are nicio miscare valida
             if deplasament_best is None:
                 deplasament_best = (0, 0)
 
