@@ -1,9 +1,9 @@
 import copy
-from typing import Optional
+from typing import Optional, List, Tuple
 
 
 class Nod:
-    def __init__(self, matrice: list[list[int]], h=None):
+    def __init__(self, matrice: List[List[int]], h=None):
         self.matrice = matrice
 
         # Nu ne mai este data distanta estimata pana la un nod scop, trebuie sa o estimam noi
@@ -40,7 +40,7 @@ class Nod:
         return h
 
     @staticmethod
-    def sunt_matrici_egale(matrix_a: list[list], matrix_b: list[list]) -> bool:
+    def sunt_matrici_egale(matrix_a: List[list], matrix_b: List[list]) -> bool:
         for i in range(Problema.N):
             for j in range(Problema.N):
                 if matrix_a[i][j] != matrix_b[i][j]:
@@ -119,7 +119,7 @@ class Problema:
                 return x
         return None
 
-    def sortare_open(self, x: NodParcurgere) -> tuple[int, int]:
+    def sortare_open(self, x: NodParcurgere) -> Tuple[int, int]:
         return x.f, -x.g
 
     def rezolva(self):
