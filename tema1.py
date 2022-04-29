@@ -15,6 +15,12 @@ class Punct2D:
         self.x = x
         self.y = y
 
+    def distanta_squared(self, punct):
+        return (self.x - punct.x) ** 2 + (self.y - punct.y) ** 2
+
+    def distanta_coords_squared(self, x: int, y: int):
+        return (self.x - x) ** 2 + (self.y - y) ** 2
+
     def __repr__(self) -> str:
         return f"({self.x}, {self.y})"
 
@@ -163,17 +169,92 @@ class Harta:
         # Daca au fost aplicate toate deplasamentele, atunci toate mutarile au fost valide
         return ultimul_deplasament_aplicat == len(deplasamente) - 1
 
+    def e_celula_accesibila_pisica(self, x: int, y: int):
+        """
+        Verifica daca o pisica se poate muta pe celula de la pozitia data.
+
+        :param x: coordonata X a punctului verificat
+        :param y: coordonata Y a punctului verificat
+        :return: True daca o pisica se poate muta in punctul dat, False altfel
+        """
+
+        if not self.e_celula_pe_harta(x, y):
+            return False
+
+        celula = self.harta[y][x]
+        return celula == "." or celula.startswith("s")
+
+    def e_mutare_valida_pisica(self, index_pisica: int, deplasament: Tuple[int, int]) -> bool:
+        """
+        Verifica daca o pisica poate fi mutata pe harta, aplicandu-se deplasamentul dat. De exemplu,
+        nu poti muta o pisica in afara hartii / pe o celula pe care e deja o pisica / pe un obstacol / etc.
+
+        :param index_pisica: a cata pisica sa fie mutata
+        :param deplasament: cum sa isi modifice pozitia
+        :return: True daca pisica poate fi mutata cu deplasamentul dat, False altfel
+        """
+
+        pisica = self.pisici[index_pisica]
+        return self.e_celula_accesibila_pisica(pisica.x + deplasament[0], pisica.y + deplasament[1])
+
+    def muta_pisica(self, index_pisica, deplasament: Tuple[int, int]):
+        """
+        Muta o pisica pe harta (cu un deplasament considerat deja varificat a fi valid), actualizand harta
+        (=matricea de caractere) corect.
+
+        :param index_pisica: a cata pisica sa fie mutata
+        :param deplasament: cum sa isi modifice pozitia
+        """
+
+        pisica = self.soareci[index_pisica]
+
+        # Actualizeaza pozitia veche de pe harta
+        # Dupa ce pleaca o pisica, in locul ei vechi sigur ramane spatiu liber
+        self.harta[pisica.y][pisica.x] = "."
+
+        # Aplica deplasament
+        pisica.x += deplasament[0]
+        pisica.y += deplasament[1]
+
+        # Actualizeaza pozitia noua de pe harta
+        # nou = self.harta[pisica.y][pisica.x]
+        # if nou.startswith("s"): # TODO, poate sa numar soareci aici
+        #     pass
+        # Oriunde ar ajunge pisica, punem "p[id pisica]"
+        self.harta[pisica.y][pisica.x] = f"p{index_pisica}"
+
     def muta_pisici(self):
         """
         Muta pisicile, una cate una, catre pozitia optima acestora (folosind regulile date in enuntul problemei).
         """
 
-        # TODO
+        for index_pisica, pisica in enumerate(self.pisici):
+            # Gasim cel mai apropiat soarece de pisica
+            index_closest_soarece = 0
+            distanta_closest_soarece = pisica.distanta_squared(self.soareci[0])
+            for index_soarece in range(1, len(self.soareci)):
+                distanta = pisica.distanta_squared(self.soareci[index_soarece])
+                if distanta < distanta_closest_soarece:
+                    index_closest_soarece = index_soarece
+                    distanta_closest_soarece = distanta
 
-        pass
+            # Gasim casuta valida vecina apropiata de cel mai apropiat soarece
+            deplasament_best = None
+            distanta_best = float("inf")
+            deplasamente = [(0, -1), (-1, -1), (-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1)]
+            for deplasament in deplasamente:
+                if self.e_mutare_valida_pisica(index_pisica, deplasament):
+                    distanta = pisica.distanta_coords_squared(pisica.x + deplasament[0], pisica.y + deplasament[1])
+                    if distanta < distanta_best:
+                        deplasament_best = deplasament
+                        distanta = distanta_best
+
+            # Actualizam harta, mutand fizic pisica
+            self.muta_pisica(index_pisica, deplasament_best)
 
 
 # ----------------------------------------------------------------------------------------------
+
 
 class Nod:
     def __init__(self, harta: List[List[str]], h: int = None):
@@ -226,12 +307,12 @@ class NodParcurgere:
                 if self.nod.harta.sunt_mutari_valide_soarece(curr + [deplasament]):
                     lista_deplasamente.append(curr + [deplasament])
 
-        print(len(lista_deplasamente), lista_deplasamente)
         mutari = []
         for deplasamente in lista_deplasamente:
             nod_nou = copy.deepcopy(self.nod)
             for index, deplasament in enumerate(deplasamente):
                 nod_nou.harta.muta_soarece(index, deplasament)
+            nod_nou.harta.muta_pisici()
 
             # TODO self.g+1 posibil sa nu fie corect
             mutari.append(NodParcurgere(nod_nou, self, self.g + 1))
