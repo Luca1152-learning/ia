@@ -64,14 +64,36 @@ class Harta:
 
     def muta_soarece(self, index_soarece: int, deplasament: Tuple[int, int]):
         """
-        Muta un soarece pe harta, actualizand harta (=matricea de caractere) corect.
+        Muta un soarece pe harta (cu un deplasament considerat deja varificat a fi valid), actualizand harta
+        (=matricea de caractere) corect.
 
         :param index_soarece: al catalea soarece sa fie mutat
         :param deplasament: cum sa isi modifice pozitia
         """
 
-        if self.e_mutare_valida_soarece(index_soarece, deplasament):
-            pass  # TODO
+        soarece = self.soareci[index_soarece]
+
+        # Actualizeaza pozitia veche de pe harta
+        curr = self.harta[soarece.y][soarece.x]
+        if curr.startswith("s"):
+            # Soarecele nu e intr-un ascunzis, deci e intr-un loc liber
+            self.harta[soarece.y][soarece.x] = "."
+        elif curr.startswith("S"):
+            # Ascunzisul a fost eliberat
+            self.harta[soarece.y][soarece.x] = "@"
+
+        # Aplica deplasament
+        soarece.x += deplasament[0]
+        soarece.y += deplasament[1]
+
+        # Actualizeaza pozitia noua de pe harta
+        nou = self.harta[soarece.y][soarece.x]
+        if nou == ".":
+            # Am ajuns intr-un loc liber
+            self.harta[soarece.y][soarece.x] = f"s{index_soarece}"
+        elif nou == "@":
+            # Am ajuns intr-un ascunzis
+            self.harta[soarece.y][soarece.x] = f"S{index_soarece}"
 
     def e_celula_pe_harta(self, x: int, y: int):
         """
@@ -112,7 +134,7 @@ class Harta:
         soarece = self.soareci[index_soarece]
         return self.e_celula_accesibila_soarece(soarece.x + deplasament[0], soarece.y + deplasament[1])
 
-    def sunt_mutari_valide_soarece(self, deplasamente: List[Tuple[int, int]]):
+    def sunt_mutari_valide_soarece(self, deplasamente: List[Tuple[int, int]]) -> bool:
         """
         Verifica daca secventa de deplasamente poate fi aplicata pe soarecii cu indicii [0, len(deplasamente)].
         Astfel, dupa fiecare mutare valida, harta e modificata corespunzator si se continua cu urmatoarea mutare.
@@ -121,7 +143,25 @@ class Harta:
         :param deplasamente: lista cu deplasamentele care sa fie aplicate soarecilor cu indicii [0, len(deplasamente)]
         :return: True daca secventa de deplasamente e valida, False altfel
         """
-        pass
+
+        # Aplica deplasamentele (tinand cont de cate au fost aplicate)
+        ultimul_deplasament_aplicat = -1
+        for index_soarece, deplasament in enumerate(deplasamente):
+            if not self.e_mutare_valida_soarece(index_soarece, deplasament):
+                break
+
+            self.muta_soarece(index_soarece, deplasament)
+            ultimul_deplasament_aplicat = index_soarece
+
+        # Restaureaza la loc harta (aplicand invers deplasamentele, de la ultimul aplicat la primul)
+        for index_deplasament in reversed(range(0, ultimul_deplasament_aplicat + 1)):
+            deplasament = deplasamente[index_deplasament]
+            deplasament_negat = [-1 * deplasament[0], -1 * deplasament[1]]
+
+            self.muta_soarece(index_deplasament, deplasament_negat)
+
+        # Daca au fost aplicate toate deplasamentele, atunci toate mutarile au fost valide
+        return ultimul_deplasament_aplicat == len(deplasamente) - 1
 
     def muta_pisici(self):
         """
@@ -192,8 +232,6 @@ class NodParcurgere:
             nod_nou = copy.deepcopy(self.nod)
             for index, deplasament in enumerate(deplasamente):
                 nod_nou.harta.muta_soarece(index, deplasament)
-
-            break  # TODO
 
             # TODO self.g+1 posibil sa nu fie corect
             mutari.append(NodParcurgere(nod_nou, self, self.g + 1))
