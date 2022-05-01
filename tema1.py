@@ -1,5 +1,6 @@
 import copy
 from collections import deque
+from enum import Enum
 from typing import List, Tuple
 
 
@@ -27,6 +28,16 @@ class Punct2D:
 
 # ----------------------------------------------------------------------------------------------
 
+class EvenimentJoc(Enum):
+    PISICA_MANCAT_SOARECE = 1
+    SOARECE_ASCUNS = 2
+    SOARECE_IESIT_HARTA = 3
+    PISICA_BLOCATA = 4
+    SOARECE_BLOCAT = 5
+
+
+# ----------------------------------------------------------------------------------------------
+
 class Harta:
     def __init__(self, harta: List[List[str]]):
         """
@@ -37,6 +48,7 @@ class Harta:
 
         self.harta = harta
         self.pisici, self.soareci, self.ascunzisuri, self.iesiri = self.gaseste_puncte_speciale()
+        self.evenimente = []  # Lista de obiecte de tip EvenimentJoc
 
     def gaseste_puncte_speciale(self) -> Tuple[List[Punct2D], List[Punct2D], List[Punct2D], List[Punct2D]]:
         """
@@ -47,8 +59,9 @@ class Harta:
         """
 
         # Stocheaza pisicile + soarecii in dictionare pe masura ce sunt gasiti (fiind sortati ulterior)
-        pisici, soareci = {}, {}
+        dict_pisici, dict_soareci = {}, {}
         ascunzisuri_libere, iesiri = [], []
+        max_indice_soarece = -1
         for y, linie in enumerate(self.harta):
             for x, celula in enumerate(linie):
                 if celula == "@":
@@ -57,25 +70,37 @@ class Harta:
                     iesiri.append(Punct2D(x, y))
                 elif celula.startswith("p"):
                     indice = int(celula[1:])
-                    pisici[indice] = Punct2D(x, y)
+                    dict_pisici[indice] = Punct2D(x, y)
                 elif celula.startswith("s") or celula.startswith("S"):
                     indice = int(celula[1:])
-                    soareci[indice] = Punct2D(x, y)
+                    dict_soareci[indice] = Punct2D(x, y)
+                    max_indice_soarece = max(max_indice_soarece, indice)
 
         # Transforma dictionarele in liste, dupa ce sunt sortate entitatile dupa indici
-        pisici = [value for key, value in sorted(pisici.items())]
-        soareci = [value for key, value in sorted(soareci.items())]
+        pisici = [value for key, value in sorted(dict_pisici.items())]
+        # Totusi, e posibil ca unii soareci (poate de la mijloc) sa fi iesit deja de pe harta. In cazul asta, in lista,
+        # pe pozitia lor, va fi None
+        soareci = [None for _ in range(max_indice_soarece + 1)]
+        for indice_soarece in range(max_indice_soarece + 1):
+            if indice_soarece in dict_soareci:
+                soareci[indice_soarece] = dict_soareci[indice_soarece]
 
         return pisici, soareci, ascunzisuri_libere, iesiri
 
-    def muta_soarece(self, index_soarece: int, deplasament: Tuple[int, int]):
+    def muta_soarece(self, index_soarece: int, deplasament: Tuple[int, int], simuleaza: bool = False):
         """
         Muta un soarece pe harta (cu un deplasament considerat deja varificat a fi valid), actualizand harta
         (=matricea de caractere) corect.
 
         :param index_soarece: al catalea soarece sa fie mutat
         :param deplasament: cum sa isi modifice pozitia
+        :param simuleaza: True daca vrem doar sa simulam ce s-ar intampla cu harta (fara sa modificam lista de entitati
+        sau sa trimitem evenimentele) - util pentru a verifica daca o secventa de miscari a soarecilor e valida. Implicit
+        False.
         """
+
+        if self.soareci[index_soarece] is None:
+            raise Exception(f"Soarecele {index_soarece} deja a iesit de pe harta.")
 
         soarece = self.soareci[index_soarece]
 
@@ -100,6 +125,14 @@ class Harta:
         elif nou == "@":
             # Am ajuns intr-un ascunzis
             self.harta[soarece.y][soarece.x] = f"S{index_soarece}"
+            if not simuleaza:
+                self.evenimente.append({"tip": EvenimentJoc.SOARECE_ASCUNS, "id": index_soarece})
+        elif nou == "E" and not simuleaza:
+            self.evenimente.append({"tip": EvenimentJoc.SOARECE_IESIT_HARTA, "id": index_soarece})
+            self.soareci[index_soarece] = None
+
+        if deplasament == (0, 0) and not simuleaza:
+            self.evenimente.append({"tip": EvenimentJoc.SOARECE_BLOCAT, "id": index_soarece})
 
     def e_celula_pe_harta(self, x: int, y: int):
         """
@@ -136,6 +169,9 @@ class Harta:
         :param deplasament: cum sa isi modifice pozitia
         :return: True daca soarecele poate fi mutat cu deplasamentul dat, False altfel
         """
+
+        if self.soareci[index_soarece] is None:
+            raise Exception(f"Soarecele {index_soarece} deja a iesit de pe harta.")
 
         soarece = self.soareci[index_soarece]
         return self.e_celula_accesibila_soarece(soarece.x + deplasament[0], soarece.y + deplasament[1])
@@ -217,9 +253,13 @@ class Harta:
         pisica.y += deplasament[1]
 
         # Actualizeaza pozitia noua de pe harta
-        # nou = self.harta[pisica.y][pisica.x]
-        # if nou.startswith("s"): # TODO, poate sa numar soareci aici
-        #     pass
+        nou = self.harta[pisica.y][pisica.x]
+        if nou.startswith("s"):
+            id_soarece = int(nou[1:])
+            self.soareci[id_soarece] = None
+            self.evenimente.append(
+                {"tip": EvenimentJoc.PISICA_MANCAT_SOARECE, "id_pisica": index_pisica, "id_soarece": id_soarece}
+            )
         # Oriunde ar ajunge pisica, punem "p[id pisica]"
         self.harta[pisica.y][pisica.x] = f"p{index_pisica}"
 
@@ -230,11 +270,13 @@ class Harta:
 
         for index_pisica, pisica in enumerate(self.pisici):
             # Gasim cel mai apropiat soarece de pisica
-            # index_closest_soarece = 0
-            # distanta_closest_soarece = pisica.distanta_squared(self.soareci[0])
             index_closest_soarece = -1
             distanta_closest_soarece = float("inf")
             for index_soarece, soarece in enumerate(self.soareci):
+                # Soarecele a iesit deja de pe harta
+                if soarece is None:
+                    continue
+
                 # Daca soarecele e ascuns, ignora-l
                 if self.harta[soarece.y][soarece.x].startswith("S"):
                     continue
@@ -266,6 +308,7 @@ class Harta:
                         distanta_best = distanta_best
             # Permite pisicii sa stea pe loc daca nu are nicio miscare valida
             if deplasament_best is None:
+                self.evenimente.append({"tip": EvenimentJoc.PISICA_BLOCATA, "id": index_pisica})
                 deplasament_best = (0, 0)
 
             # Actualizam harta, mutand fizic pisica
@@ -290,7 +333,7 @@ class Nod:
     def __repr__(self) -> str:
         # TODO
 
-        return ""
+        return "Nods"
 
 
 # ----------------------------------------------------------------------------------------------
@@ -344,7 +387,7 @@ class NodParcurgere:
         return mutari
 
     def __repr__(self):
-        return ""
+        return "NodParcurgere"
 
 
 # ----------------------------------------------------------------------------------------------
