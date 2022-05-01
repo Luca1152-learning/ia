@@ -19,9 +19,9 @@ class Harta:
 
         # Pentru calcularea costului mutarii
         self.soareci_prinsi = 0  # Cati soareci (in total) au fost prinsi de pisici
+        self.soareci_prinsi_pas_curent = 0
         self.soareci_mutati_pas_curent = 0
         self.soarece_iesit_pas_curent = False
-        self.soarece_prins_pas_curent = False
 
     def gaseste_puncte_speciale(self) -> Tuple[List[Punct2D], List[Punct2D], List[Punct2D], List[Punct2D]]:
         """
@@ -166,6 +166,10 @@ class Harta:
         # Aplica deplasamentele (tinand cont de cate au fost aplicate)
         ultimul_deplasament_aplicat = -1
         for index_soarece, deplasament in enumerate(deplasamente):
+            # Soarecele de la indicele curent e prins/iesit => deplasamentul lui generat a fost () => il ignoram
+            if deplasament == ():
+                continue
+
             if not self.e_mutare_valida_soarece(index_soarece, deplasament):
                 break
 
@@ -175,6 +179,11 @@ class Harta:
         # Restaureaza la loc harta (aplicand invers deplasamentele, de la ultimul aplicat la primul)
         for index_deplasament in reversed(range(0, ultimul_deplasament_aplicat + 1)):
             deplasament = deplasamente[index_deplasament]
+
+            # Soarecele de la indicele curent e prins/iesit => deplasamentul lui generat a fost () => il ignoram
+            if deplasament == ():
+                continue
+
             deplasament_negat = [-1 * deplasament[0], -1 * deplasament[1]]
 
             self.muta_soarece(index_deplasament, deplasament_negat, simuleaza=True)
@@ -238,7 +247,7 @@ class Harta:
                 {"tip": EvenimentJoc.PISICA_MANCAT_SOARECE, "id_pisica": index_pisica, "id_soarece": id_soarece}
             )
             self.soareci_prinsi += 1
-            self.soarece_prins_pas_curent = True
+            self.soareci_prinsi_pas_curent += 1
         # Oriunde ar ajunge pisica, punem "p[id pisica]"
         self.harta[pisica.y][pisica.x] = f"p{index_pisica}"
 

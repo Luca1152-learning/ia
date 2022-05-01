@@ -53,9 +53,9 @@ class NodParcurgere:
             nod_nou = copy.deepcopy(self.nod)
             # Reseteaza campurile noului nod necesare
             nod_nou.harta.evenimente = []
+            nod_nou.harta.soareci_prinsi_pas_curent = 0
             nod_nou.harta.soareci_mutati_pas_curent = 0
             nod_nou.harta.soarece_iesit_pas_curent = False
-            nod_nou.harta.soarece_prins_pas_curent = False
 
             # Muta animalele conform deplasamentelor
             mutat_soareci = False
@@ -77,8 +77,9 @@ class NodParcurgere:
             # Calculeaza costul mutarii (= ce trebuie adaugat la precedentul g)
             if nod_nou.harta.soarece_iesit_pas_curent:
                 cost = 1
-            elif nod_nou.harta.soarece_prins_pas_curent:
-                soareci = len(nod_nou.harta.soareci) - nod_nou.harta.soareci_iesiti - nod_nou.harta.soareci_prinsi + 1
+            elif nod_nou.harta.soareci_prinsi_pas_curent > 0:
+                soareci = len(nod_nou.harta.soareci) - nod_nou.harta.soareci_iesiti - nod_nou.harta.soareci_prinsi + \
+                          nod_nou.harta.soareci_prinsi_pas_curent
                 cost = len(nod_nou.harta.pisici) * soareci
             else:
                 cost = nod_nou.harta.soareci_mutati_pas_curent
