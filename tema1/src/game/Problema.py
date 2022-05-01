@@ -65,9 +65,19 @@ class Problema:
                     harta = nod_parcurgere.nod.harta
 
                     self.output_file.write(f"{index + 1}) g={nod_parcurgere.g}\n")
+
+                    # Respecta formatul hartii din enunt, unde lungimea unei coloane depinde de cel mai lung sir de caractere
+                    max_str_lengths_per_column = [0 for _ in range(len(harta.harta[0]))]
+                    for j in range(len(harta.harta[0])):
+                        for i in range(len(harta.harta)):
+                            max_str_lengths_per_column[j] = max(len(harta.harta[i][j]), max_str_lengths_per_column[j])
                     self.output_file.write(
-                        "\n".join([" ".join([cell.ljust(2, " ") for cell in line]) for line in harta.harta]) + "\n"
+                        "\n".join(
+                            [" ".join([cell.ljust(max_str_lengths_per_column[j], " ") for j, cell in enumerate(line)])
+                             for line in harta.harta]
+                        ) + "\n"
                     )
+
                     for eveniment in harta.evenimente:
                         tip = eveniment["tip"]
                         if tip == EvenimentJoc.PISICA_MANCAT_SOARECE:
