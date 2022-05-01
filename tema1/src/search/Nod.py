@@ -18,4 +18,7 @@ class Nod:
     def __repr__(self) -> str:
         # TODO
 
-        return "Nods"
+        return "Nod"
+
+    def __eq__(self, other) -> bool:
+        return self.h == other.h and self.harta.soareci_in_aceeasi_pozitie_ca_alta_harta(other.harta)

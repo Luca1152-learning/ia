@@ -25,6 +25,16 @@ class Problema:
                 return x
         return None
 
+    def e_nod_scop(self, nod: Nod) -> bool:
+        """
+        TODO
+
+        :param nod:
+        :return:
+        """
+
+        return nod.harta.numar_soareci_iesiti == self.k
+
     def rezolva(self):
         open = []  # Nodurile ce urmeaza sa fie expandate
         closed = []  # Nodurile deja expandate
@@ -33,49 +43,51 @@ class Problema:
         nod_start = NodParcurgere(self.start, None, 0)
         open.append(nod_start)
 
+        self.numar_soareci_initial = len(nod_start.nod.harta.soareci)
+
         while open:
             # Stergem si stocam ultimul element. Nu primul, deoarece open e sortat in ordinea inversa
             # necesara algoritmului - tocmai pentru a putea face pop() rapid
             nod_curent = open.pop()
 
             # Am gasit un nod scop
-            # if nod_curent.nod in self.scop:
-            #     drum = []
-            #
-            #     nod_i = nod_curent
-            #     while nod_i:
-            #         drum.append(nod_i.nod)
-            #         nod_i = nod_i.parinte
-            #
-            #     for nod in reversed(drum):
-            #         print(nod.info)
-            #
-            #     return
+            if self.e_nod_scop(nod_curent.nod):
+                drum = []
+
+                nod_i = nod_curent
+                while nod_i:
+                    drum.append(nod_i.nod)
+                    nod_i = nod_i.parinte
+
+                for nod in reversed(drum):
+                    print("\n".join([" ".join([cell.ljust(2, " ") for cell in line]) for line in nod.harta.harta]))
+                    print()
+
+                return
 
             # Expandeaza nodul curent
             closed.append(nod_curent)  # Marcheaza-l ca expandat (punandu-l in closed)
             succesori = nod_curent.expandeaza()
 
             for succesor in succesori:
-                pass
-                # nod_nou = succesor
-                #
-                # # Cautam succesor in open
-                # nod_in_open = self.cauta_nod_parcurgere(succesor, open)
-                # if nod_in_open is not None:
-                #     # Am gasit un drum mai bun catre succesor
-                #     if succesor.f < nod_in_open.f:
-                #         open.remove(nod_in_open)
-                #     else:
-                #         nod_nou = None
-                #
-                # # succesor a fost expandat in trecut
-                # nod_in_closed = self.cauta_nod_parcurgere(succesor, closed)
-                # if nod_in_closed:
-                #     closed.remove(nod_in_closed)
-                #     nod_nou = succesor
-                #
-                # if nod_nou is not None:
-                #     open.append(nod_nou)
-                #     # Sorteaza invers criteriului algoritmului, pentru a putea face pop() rapid
-                #     open.sort(key=self.sortare_open, reverse=True)
+                nod_nou = succesor
+
+                # Cautam succesor in open
+                nod_in_open = self.cauta_nod_parcurgere(succesor, open)
+                if nod_in_open is not None:
+                    # Am gasit un drum mai bun catre succesor
+                    if succesor.f < nod_in_open.f:
+                        open.remove(nod_in_open)
+                    else:
+                        nod_nou = None
+
+                # succesor a fost expandat in trecut
+                nod_in_closed = self.cauta_nod_parcurgere(succesor, closed)
+                if nod_in_closed:
+                    closed.remove(nod_in_closed)
+                    nod_nou = succesor
+
+                if nod_nou is not None:
+                    open.append(nod_nou)
+                    # Sorteaza invers criteriului algoritmului, pentru a putea face pop() rapid
+                    open.sort(key=self.sortare_open, reverse=True)

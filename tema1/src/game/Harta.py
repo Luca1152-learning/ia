@@ -14,6 +14,7 @@ class Harta:
 
         self.harta = harta
         self.pisici, self.soareci, self.ascunzisuri, self.iesiri = self.gaseste_puncte_speciale()
+        self.numar_soareci_iesiti = 0  # Cati soareci au iesit de pe harta (ajungand in 'E')
         self.evenimente = []  # Lista de obiecte de tip EvenimentJoc
 
     def gaseste_puncte_speciale(self) -> Tuple[List[Punct2D], List[Punct2D], List[Punct2D], List[Punct2D]]:
@@ -96,6 +97,7 @@ class Harta:
         elif nou == "E" and not simuleaza:
             self.evenimente.append({"tip": EvenimentJoc.SOARECE_IESIT_HARTA, "id": index_soarece})
             self.soareci[index_soarece] = None
+            self.numar_soareci_iesiti += 1
 
         if deplasament == (0, 0) and not simuleaza:
             self.evenimente.append({"tip": EvenimentJoc.SOARECE_BLOCAT, "id": index_soarece})
@@ -158,7 +160,7 @@ class Harta:
             if not self.e_mutare_valida_soarece(index_soarece, deplasament):
                 break
 
-            self.muta_soarece(index_soarece, deplasament)
+            self.muta_soarece(index_soarece, deplasament, simuleaza=True)
             ultimul_deplasament_aplicat = index_soarece
 
         # Restaureaza la loc harta (aplicand invers deplasamentele, de la ultimul aplicat la primul)
@@ -166,7 +168,7 @@ class Harta:
             deplasament = deplasamente[index_deplasament]
             deplasament_negat = [-1 * deplasament[0], -1 * deplasament[1]]
 
-            self.muta_soarece(index_deplasament, deplasament_negat)
+            self.muta_soarece(index_deplasament, deplasament_negat, simuleaza=True)
 
         # Daca au fost aplicate toate deplasamentele, atunci toate mutarile au fost valide
         return ultimul_deplasament_aplicat == len(deplasamente) - 1
@@ -279,3 +281,21 @@ class Harta:
 
             # Actualizam harta, mutand fizic pisica
             self.muta_pisica(index_pisica, deplasament_best)
+
+    def soareci_in_aceeasi_pozitie_ca_alta_harta(self, harta) -> bool:
+        """
+        TODO
+
+        :param harta:
+        :return:
+        """
+
+        if len(self.soareci) != len(harta.soareci):
+            return False
+
+        for index_soarece_self, soarece_self in enumerate(self.soareci):
+            soarece_harta = harta.soareci[index_soarece_self]
+            if soarece_self != soarece_harta:
+                return False
+
+        return True
