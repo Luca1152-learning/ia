@@ -1,5 +1,6 @@
 from tema1.src.search.Nod import Nod
 from tema1.src.search.NodParcurgere import NodParcurgere
+from tema1.src.utils.EvenimentJoc import EvenimentJoc
 
 
 class Problema:
@@ -61,6 +62,18 @@ class Problema:
 
                 for nod in reversed(drum):
                     print("\n".join([" ".join([cell.ljust(2, " ") for cell in line]) for line in nod.harta.harta]))
+                    for eveniment in nod.harta.evenimente:
+                        tip = eveniment["tip"]
+                        if tip == EvenimentJoc.PISICA_MANCAT_SOARECE:
+                            print(f"Pisica p{eveniment['id_pisica']} a mancat soarecele s{eveniment['id_soarece']}.")
+                        elif tip == EvenimentJoc.SOARECE_ASCUNS:
+                            print(f"Soarecele s{eveniment['id']} s-a ascuns.")
+                        elif tip == EvenimentJoc.SOARECE_IESIT_HARTA:
+                            print(f"Soarecele s{eveniment['id']} a iesit de pe harta.")
+                        elif tip == EvenimentJoc.PISICA_BLOCATA:
+                            print(f"Pisica p{eveniment['id']} nu s-a putut misca.")
+                        elif tip == EvenimentJoc.SOARECE_BLOCAT:
+                            print(f"Soarecele s{eveniment['id']} nu s-a putut misca.")
                     print()
 
                 return
