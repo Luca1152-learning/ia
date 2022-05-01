@@ -4,8 +4,9 @@ from tema1.src.utils.EvenimentJoc import EvenimentJoc
 
 
 class Problema:
-    def __init__(self, filepath: str):
-        self.start, self.k = self._citeste(filepath)
+    def __init__(self, input_filepath: str, output_filepath: str):
+        self.start, self.k = self._citeste(input_filepath)
+        self.output_file = open(output_filepath, "w")  # Inchis in destructor
 
     def _citeste(self, filepath: str):
         with open(filepath, "r") as f:
@@ -63,21 +64,25 @@ class Problema:
                 for index, nod_parcurgere in enumerate(reversed(drum)):
                     harta = nod_parcurgere.nod.harta
 
-                    print(f"{index + 1}) g={nod_parcurgere.g}")
-                    print("\n".join([" ".join([cell.ljust(2, " ") for cell in line]) for line in harta.harta]))
+                    self.output_file.write(f"{index + 1}) g={nod_parcurgere.g}\n")
+                    self.output_file.write(
+                        "\n".join([" ".join([cell.ljust(2, " ") for cell in line]) for line in harta.harta]) + "\n"
+                    )
                     for eveniment in harta.evenimente:
                         tip = eveniment["tip"]
                         if tip == EvenimentJoc.PISICA_MANCAT_SOARECE:
-                            print(f"Pisica p{eveniment['id_pisica']} a mancat soarecele s{eveniment['id_soarece']}.")
+                            self.output_file.write(
+                                f"Pisica p{eveniment['id_pisica']} a mancat soarecele s{eveniment['id_soarece']}.\n"
+                            )
                         elif tip == EvenimentJoc.SOARECE_ASCUNS:
-                            print(f"Soarecele s{eveniment['id']} s-a ascuns.")
+                            self.output_file.write(f"Soarecele s{eveniment['id']} s-a ascuns.\n")
                         elif tip == EvenimentJoc.SOARECE_IESIT_HARTA:
-                            print(f"Soarecele s{eveniment['id']} a iesit de pe harta.")
+                            self.output_file.write(f"Soarecele s{eveniment['id']} a iesit de pe harta.\n")
                         elif tip == EvenimentJoc.PISICA_BLOCATA:
-                            print(f"Pisica p{eveniment['id']} nu s-a putut misca.")
+                            self.output_file.write(f"Pisica p{eveniment['id']} nu s-a putut misca.\n")
                         elif tip == EvenimentJoc.SOARECE_BLOCAT:
-                            print(f"Soarecele s{eveniment['id']} nu s-a putut misca.")
-                    print()
+                            self.output_file.write(f"Soarecele s{eveniment['id']} nu s-a putut misca.\n")
+                    self.output_file.write("\n")
 
                 return
 
@@ -107,3 +112,6 @@ class Problema:
                     open.append(nod_nou)
                     # Sorteaza invers criteriului algoritmului, pentru a putea face pop() rapid
                     open.sort(key=self.sortare_open, reverse=True)
+
+    def __del__(self):
+        self.output_file.close()
