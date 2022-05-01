@@ -60,7 +60,8 @@ class Problema:
                     drum.append(nod_i.nod)
                     nod_i = nod_i.parinte
 
-                for nod in reversed(drum):
+                for index, nod in enumerate(reversed(drum)):
+                    print(f"{index + 1})")
                     print("\n".join([" ".join([cell.ljust(2, " ") for cell in line]) for line in nod.harta.harta]))
                     for eveniment in nod.harta.evenimente:
                         tip = eveniment["tip"]
