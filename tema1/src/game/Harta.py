@@ -151,7 +151,8 @@ class Harta:
             raise Exception(f"Soarecele {index_soarece} deja a iesit de pe harta.")
 
         soarece = self.soareci[index_soarece]
-        return self.e_celula_accesibila_soarece(soarece.x + deplasament[0], soarece.y + deplasament[1])
+        return (deplasament == (0, 0) or
+                self.e_celula_accesibila_soarece(soarece.x + deplasament[0], soarece.y + deplasament[1]))
 
     def sunt_mutari_valide_soarece(self, deplasamente: List[Tuple[int, int]]) -> bool:
         """
