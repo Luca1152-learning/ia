@@ -273,7 +273,7 @@ class Harta:
                     )
                     if distanta < distanta_best:
                         deplasament_best = deplasament
-                        distanta_best = distanta_best
+                        distanta_best = distanta
             # Permite pisicii sa stea pe loc daca nu are nicio miscare valida
             if deplasament_best is None:
                 self.evenimente.append({"tip": EvenimentJoc.PISICA_BLOCATA, "id": index_pisica})
