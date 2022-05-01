@@ -1,9 +1,9 @@
 import copy
-from typing import Optional
+from typing import Optional, List, Tuple
 
 
 class Nod:
-    def __init__(self, stive: list[list[int]], h=None):
+    def __init__(self, stive: List[List[int]], h=None):
         # O lista cu cele N stive din problema (ce sunt tot liste)
         self.stive = stive
 
@@ -40,7 +40,7 @@ class Nod:
         return h
 
     @staticmethod
-    def sunt_matrici_egale(matrix_a: list[list], matrix_b: list[list]) -> bool:
+    def sunt_matrici_egale(matrix_a: List[List], matrix_b: List[List]) -> bool:
         if len(matrix_a) != len(matrix_b):
             return False
 
@@ -131,7 +131,7 @@ class Problema:
                 return x
         return None
 
-    def sortare_open(self, x: NodParcurgere) -> tuple[int, int]:
+    def sortare_open(self, x: NodParcurgere) -> Tuple[int, int]:
         return (x.f, -x.g)
 
     def rezolva(self):
