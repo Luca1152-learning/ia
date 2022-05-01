@@ -14,8 +14,14 @@ class Harta:
 
         self.harta = harta
         self.pisici, self.soareci, self.ascunzisuri, self.iesiri = self.gaseste_puncte_speciale()
-        self.numar_soareci_iesiti = 0  # Cati soareci au iesit de pe harta (ajungand in 'E')
+        self.soareci_iesiti = 0  # Cati soareci (in total) au iesit de pe harta (ajungand in 'E')
         self.evenimente = []  # Lista de obiecte de tip EvenimentJoc
+
+        # Pentru calcularea costului mutarii
+        self.soareci_prinsi = 0  # Cati soareci (in total) au fost prinsi de pisici
+        self.soareci_mutati_pas_curent = 0
+        self.soarece_iesit_pas_curent = False
+        self.soarece_prins_pas_curent = False
 
     def gaseste_puncte_speciale(self) -> Tuple[List[Punct2D], List[Punct2D], List[Punct2D], List[Punct2D]]:
         """
@@ -97,10 +103,13 @@ class Harta:
         elif nou == "E" and not simuleaza:
             self.evenimente.append({"tip": EvenimentJoc.SOARECE_IESIT_HARTA, "id": index_soarece})
             self.soareci[index_soarece] = None
-            self.numar_soareci_iesiti += 1
+            self.soareci_iesiti += 1
+            self.soarece_iesit_pas_curent = True
 
         if deplasament == (0, 0) and not simuleaza:
             self.evenimente.append({"tip": EvenimentJoc.SOARECE_BLOCAT, "id": index_soarece})
+        elif deplasament != (0, 0) and not simuleaza:
+            self.soareci_mutati_pas_curent += 1
 
     def e_celula_pe_harta(self, x: int, y: int):
         """
@@ -228,6 +237,8 @@ class Harta:
             self.evenimente.append(
                 {"tip": EvenimentJoc.PISICA_MANCAT_SOARECE, "id_pisica": index_pisica, "id_soarece": id_soarece}
             )
+            self.soareci_prinsi += 1
+            self.soarece_prins_pas_curent = True
         # Oriunde ar ajunge pisica, punem "p[id pisica]"
         self.harta[pisica.y][pisica.x] = f"p{index_pisica}"
 

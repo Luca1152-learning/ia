@@ -34,7 +34,7 @@ class Problema:
         :return:
         """
 
-        return nod.harta.numar_soareci_iesiti == self.k
+        return nod.harta.soareci_iesiti == self.k
 
     def rezolva(self):
         open = []  # Nodurile ce urmeaza sa fie expandate
@@ -57,13 +57,15 @@ class Problema:
 
                 nod_i = nod_curent
                 while nod_i:
-                    drum.append(nod_i.nod)
+                    drum.append(nod_i)
                     nod_i = nod_i.parinte
 
-                for index, nod in enumerate(reversed(drum)):
-                    print(f"{index + 1})")
-                    print("\n".join([" ".join([cell.ljust(2, " ") for cell in line]) for line in nod.harta.harta]))
-                    for eveniment in nod.harta.evenimente:
+                for index, nod_parcurgere in enumerate(reversed(drum)):
+                    harta = nod_parcurgere.nod.harta
+
+                    print(f"{index + 1}) g={nod_parcurgere.g}")
+                    print("\n".join([" ".join([cell.ljust(2, " ") for cell in line]) for line in harta.harta]))
+                    for eveniment in harta.evenimente:
                         tip = eveniment["tip"]
                         if tip == EvenimentJoc.PISICA_MANCAT_SOARECE:
                             print(f"Pisica p{eveniment['id_pisica']} a mancat soarecele s{eveniment['id_soarece']}.")
