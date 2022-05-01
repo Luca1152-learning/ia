@@ -32,6 +32,12 @@ class NodParcurgere:
                 lista_deplasamente.appendleft(curr)
                 break
 
+            id_soarece_de_mutat = len(curr)
+            # Soarecele pe care vrem sa il mutam a fost prins de pisici / a iesit de pe harta
+            if self.nod.harta.soareci[id_soarece_de_mutat] is None:
+                lista_deplasamente.append(curr + [()])
+                continue
+
             adaugat_deplasament = False
             for deplasament in [(-1, 0), (0, 1), (1, 0), (0, -1)]:
                 if self.nod.harta.sunt_mutari_valide_soarece(curr + [deplasament]):
@@ -44,8 +50,22 @@ class NodParcurgere:
         mutari = []
         for deplasamente in lista_deplasamente:
             nod_nou = copy.deepcopy(self.nod)
+
+            # Muta animalele conform deplasamentelor
+            mutat_soareci = False
             for index, deplasament in enumerate(deplasamente):
+                # Soarecele pe care vrem sa il mutam a fost prins de pisici / a iesit de pe harta
+                if nod_nou.harta.soareci[index] is None:
+                    continue
+
+                mutat_soareci = True
                 nod_nou.harta.muta_soarece(index, deplasament)
+
+            # Daca nu am mutat niciun soarece (fiind toti morti/iesiti de pe harta), inseamna ca mutarea curenta e nula,
+            # deci nu o adaugam la mutari
+            if not mutat_soareci:
+                continue
+
             nod_nou.harta.muta_pisici()
 
             # TODO self.g+1 posibil sa nu fie corect
