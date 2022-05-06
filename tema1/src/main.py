@@ -6,6 +6,8 @@ from tema1.src.game.Problema import Problema
 
 
 def setup_cli():
+    """TODO"""
+
     parser = argparse.ArgumentParser(description="Rezolva problema 'Șoareci și pisici'.")
     parser.add_argument("-i", "--input", metavar="PATH",
                         help="calea absoluta catre folderul de input", required=True)
@@ -18,7 +20,9 @@ def setup_cli():
 
     args = parser.parse_args()
 
+    # TODO check if the paths (input & output) are valid
     for input_file_name in os.listdir(args.input):
+        # TODO use path.join
         input_file_path = args.input + "/" + input_file_name
         file_name = str(Path(input_file_name).stem)
         p = Problema(input_file_path, args.output + "/" + file_name + "-output.out")
