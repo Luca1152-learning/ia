@@ -103,7 +103,7 @@ class Problema:
                     nod_i = nod_i.parinte
 
                 # Statistici
-                self.lungime_drum = len(drum)
+                self.lungime_drum = len(drum) - 1
                 algoritm_end = timer()
                 self.durata_algoritm = algoritm_end - algoritm_start
                 self.cost_drum = nod_curent.g
