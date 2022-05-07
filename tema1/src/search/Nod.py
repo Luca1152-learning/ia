@@ -5,16 +5,19 @@ from tema1.src.search.Euristica import Euristica
 
 
 class Nod:
-    def __init__(self, harta: List[List[str]], e_nod_start: bool = False, euristica: Euristica = Euristica.BANALA):
+    def __init__(self, harta: List[List[str]], k: int = False, e_nod_start: bool = False,
+                 euristica: Euristica = Euristica.BANALA):
         """
         Initializeaza un obiect de tip Nod, ce contine informatii despre harta si entitatile de pe aceasta.
 
         :param harta: o matrice de caractere cu harta nodului
+        :param k: numarul k din enunt, numarul de soraeci ce trebuie sa scape
         :param e_nod_start: True daca nodul curent este cel de START, False altfel
         :param euristica: ce euristica sa fie folosita in calculul h-ului, daca este cazul
         """
         self.euristica = euristica
         self.harta = Harta(harta)
+        self.k = k
 
         # Se aplica pentru nodul de
         self.h = self.estimeaza_h(self.euristica) if not e_nod_start else float("inf")
@@ -52,7 +55,7 @@ class Nod:
         # suma dist manhattan catre cel mai apropiat finish
         # handle case ajung in acelasi timp la finish => cost 1
 
-        suma_distante = 0
+        distante = []
         for soarece in self.harta.soareci:
             # Soarecele curent a fost prins / a niesit de pe harta - il ignoram
             if soarece is None:
@@ -61,22 +64,23 @@ class Nod:
             dist_min_iesire = float("inf")
             for iesire in self.harta.iesiri:
                 dist_min_iesire = min(dist_min_iesire, soarece.distanta_manhattan(iesire))
-            suma_distante += dist_min_iesire
+            distante.append(dist_min_iesire)
+        distante.sort()
 
-        return suma_distante
+        return sum(distante[0:self.k - self.harta.soareci_iesiti])
 
     def h_euristica_admisibila2(self) -> int:
         """TODO"""
 
-        # 1 - dist reala
-        suma_distante = 0
+        distante = []
         for soarece in self.harta.soareci:
             # Soarecele curent a fost prins / a niesit de pe harta - il ignoram
             if soarece is None:
                 continue
-            suma_distante += self.harta.distante_reale_iesiri[soarece.y][soarece.x]
+            distante.append(self.harta.distante_reale_iesiri[soarece.y][soarece.x])
+        distante.sort()
 
-        return suma_distante
+        return sum(distante[0: self.k - self.harta.soareci_iesiti])
 
     def h_euristica_neadmisibila(self) -> int:
         """TODO"""

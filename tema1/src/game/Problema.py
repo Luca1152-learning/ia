@@ -29,7 +29,7 @@ class Problema:
 
             map_string = f.read()
             map = [line.split(" ") for line in map_string.split("\n")]
-            start = Nod(map, e_nod_start=True, euristica=self.euristica)
+            start = Nod(map, k, e_nod_start=True, euristica=self.euristica)
 
             return start, k
 
