@@ -33,7 +33,7 @@ def setup_cli():
     args = parser.parse_args()
 
     # TODO check if the paths (input & output) are valid
-    for input_file_name in os.listdir(args.input):
+    for input_file_name in sorted(os.listdir(args.input)):
         # TODO use path.join
         input_file_path = args.input + "/" + input_file_name
         file_name = str(Path(input_file_name).stem)
@@ -41,6 +41,12 @@ def setup_cli():
         for euristica in Euristica:
             p = Problema(input_file_path, f"{args.output}/{file_name}-{euristica_to_str(euristica)}.out", euristica)
             p.rezolva()
+
+            print(f"[{file_name}] A* optimizat, euristica {euristica_to_str(euristica)} - lungime {p.lungime_drum}" +
+                  f" - cost {p.cost_drum} - {p.durata_algoritm:.2f}s - {p.max_noduri_existente} max noduri" +
+                  f" - {p.total_noduri_calculate} total noduri")
+
+        print()
 
 
 setup_cli()

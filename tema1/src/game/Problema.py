@@ -1,3 +1,5 @@
+from timeit import default_timer as timer
+
 from tema1.src.search.Euristica import Euristica
 from tema1.src.search.Nod import Nod
 from tema1.src.search.NodParcurgere import NodParcurgere
@@ -11,6 +13,13 @@ class Problema:
         self.euristica = euristica
         self.start, self.k = self._citeste(input_filepath)
         self.output_file = open(output_filepath, "w")  # Inchis in destructor
+
+        # Statistici
+        self.lungime_drum = 0
+        self.cost_drum = 0
+        self.durata_algoritm = 0
+        self.max_noduri_existente = 0
+        self.total_noduri_calculate = 0
 
     def _citeste(self, filepath: str):
         """TODO"""
@@ -56,20 +65,30 @@ class Problema:
     def rezolva(self):
         """TODO"""
 
+        # Statistici
+        algoritm_start = timer()
+
+        # A*
         open = []  # Nodurile ce urmeaza sa fie expandate
         closed = []  # Nodurile deja expandate
-
         nod_start = NodParcurgere(self.start, None, 0)
         self.numar_soareci_initial = len(nod_start.nod.harta.soareci)
 
         # Verificam (relativ naiv) daca se poate ajunge intr-un nod scop, numarand cati soareci pot ajunge la iesiri
         # si comparand cu k
         if not self.are_solutie(nod_start):
+            self.lungime_drum = 0
+            self.durata_algoritm = timer() - algoritm_start
             return
 
         # Posibil sa avem solutie. Continuam cu A*.
+
         open.append(nod_start)
+        self.total_noduri_calculate = 1
         while open:
+            # Statistici
+            self.max_noduri_existente = max(self.max_noduri_existente, len(open) + len(closed))
+
             # Stergem si stocam ultimul element. Nu primul, deoarece open e sortat in ordinea inversa
             # necesara algoritmului - tocmai pentru a putea face pop() rapid
             nod_curent = open.pop()
@@ -82,6 +101,12 @@ class Problema:
                 while nod_i:
                     drum.append(nod_i)
                     nod_i = nod_i.parinte
+
+                # Statistici
+                self.lungime_drum = len(drum)
+                algoritm_end = timer()
+                self.durata_algoritm = algoritm_end - algoritm_start
+                self.cost_drum = nod_curent.g
 
                 for index, nod_parcurgere in enumerate(reversed(drum)):
                     harta = nod_parcurgere.nod.harta
@@ -121,6 +146,7 @@ class Problema:
             # Expandeaza nodul curent
             closed.append(nod_curent)  # Marcheaza-l ca expandat (punandu-l in closed)
             succesori = nod_curent.expandeaza()
+            self.total_noduri_calculate += len(succesori)
 
             for succesor in succesori:
                 nod_nou = succesor

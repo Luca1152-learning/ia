@@ -45,3 +45,9 @@ class Punct2D:
 
     def __repr__(self) -> str:
         return f"({self.x}, {self.y})"
+
+    def __eq__(self, other) -> bool:
+        if other is None:
+            return False
+
+        return self.x == other.x and self.y == other.y
