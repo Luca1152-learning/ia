@@ -55,7 +55,6 @@ class NodParcurgere:
 
         mutari = []
         for deplasamente in lista_deplasamente:
-            # TODO - creeaza un nod nou, de la 0?
             nod_nou = copy.deepcopy(self.nod)
             # Reseteaza campurile noului nod necesare
             nod_nou.harta.evenimente = []

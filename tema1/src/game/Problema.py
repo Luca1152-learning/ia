@@ -42,18 +42,33 @@ class Problema:
 
         return nod.harta.soareci_iesiti == self.k
 
+    def are_solutie(self, nod_start: NodParcurgere) -> bool:
+        """TODO"""
+
+        harta = nod_start.nod.harta
+
+        soareci_ce_pot_ajunge_la_iesiri = 0
+        for soarece in harta.soareci:
+            if harta.distante_reale_iesiri[soarece.y][soarece.x] != float("inf"):
+                soareci_ce_pot_ajunge_la_iesiri += 1
+        return soareci_ce_pot_ajunge_la_iesiri >= self.k
+
     def rezolva(self):
         """TODO"""
 
         open = []  # Nodurile ce urmeaza sa fie expandate
         closed = []  # Nodurile deja expandate
 
-        # Cream NodParcurgere de start si il adaugam in open
         nod_start = NodParcurgere(self.start, None, 0)
-        open.append(nod_start)
-
         self.numar_soareci_initial = len(nod_start.nod.harta.soareci)
 
+        # Verificam (relativ naiv) daca se poate ajunge intr-un nod scop, numarand cati soareci pot ajunge la iesiri
+        # si comparand cu k
+        if not self.are_solutie(nod_start):
+            return
+
+        # Posibil sa avem solutie. Continuam cu A*.
+        open.append(nod_start)
         while open:
             # Stergem si stocam ultimul element. Nu primul, deoarece open e sortat in ordinea inversa
             # necesara algoritmului - tocmai pentru a putea face pop() rapid

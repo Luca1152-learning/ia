@@ -1,3 +1,4 @@
+import collections
 from typing import Tuple, List
 
 from tema1.src.utils.EvenimentJoc import EvenimentJoc
@@ -22,6 +23,12 @@ class Harta:
         self.soareci_prinsi_pas_curent = 0
         self.soareci_mutati_pas_curent = 0
         self.soarece_iesit_pas_curent = False
+
+        # A doua euristica admisibila se foloseste de distantele reale (=numar corect de pasi) catre iesiri.
+        # De asemenea, poate fi folosita pentru a determina daca exista solutii.
+        # Matricea de distante va fi calculata o singura data, pentru nodul de start, restul de noduri fiind create folosind
+        # copy.deepcopy().
+        self.distante_reale_iesiri = self.calculeaza_distante_reale_iesiri()
 
     def gaseste_puncte_speciale(self) -> Tuple[List[Punct2D], List[Punct2D], List[Punct2D], List[Punct2D]]:
         """
@@ -59,6 +66,37 @@ class Harta:
                 soareci[indice_soarece] = dict_soareci[indice_soarece]
 
         return pisici, soareci, ascunzisuri_libere, iesiri
+
+    def calculeaza_distante_reale_iesiri(self) -> List[List[int]]:
+        """TODO"""
+
+        distante = [[float("inf") for _ in row] for row in self.harta]
+        for iesire in self.iesiri:
+            distante[iesire.y][iesire.x] = 0
+
+        q = collections.deque()
+        for iesire in self.iesiri:
+            q.append((0, iesire.y, iesire.x))
+
+        while q:
+            dist, y, x = q.popleft()
+            for (d_y, d_x) in [(1, 0), (0, -1), (-1, 0), (0, 1)]:
+                dist_nou = dist + 1
+                y_nou = y + d_y
+                x_nou = x + d_x
+
+                if not self.e_celula_pe_harta(x_nou, y_nou):
+                    continue
+
+                celula_noua = self.harta[y_nou][x_nou]
+                # Orice celula diferita de zid e (posibil) accesibila de un soarece. Posibil pentru ca in locul respectiv
+                # se poate sa fie deja un soarece / o pisica.
+                e_celula_posibil_accesibila = celula_noua != "#"
+                if e_celula_posibil_accesibila and dist_nou < distante[y_nou][x_nou]:
+                    distante[y_nou][x_nou] = dist_nou
+                    q.append((dist_nou, y_nou, x_nou))
+
+        return distante
 
     def muta_soarece(self, index_soarece: int, deplasament: Tuple[int, int], simuleaza: bool = False):
         """
