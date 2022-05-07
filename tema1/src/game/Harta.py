@@ -304,12 +304,7 @@ class Harta:
             self.muta_pisica(index_pisica, deplasament_best)
 
     def soareci_in_aceeasi_pozitie_ca_alta_harta(self, harta) -> bool:
-        """
-        TODO
-
-        :param harta:
-        :return:
-        """
+        """TODO"""
 
         if len(self.soareci) != len(harta.soareci):
             return False

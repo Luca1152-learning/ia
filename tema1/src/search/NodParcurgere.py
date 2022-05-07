@@ -7,12 +7,16 @@ from tema1.src.search.Nod import Nod
 
 class NodParcurgere:
     def __init__(self, nod: Nod, parinte, g: int):
+        """TODO"""
+
         self.nod = nod  # Referinta catre nodul propriu-zis
         self.parinte = parinte  # Parintele nodului din parcurgerea curenta
         self.g = g  # Adancimea (suma arcelor de la start la nodul dat)
         self.f = self.g + self.nod.h  # Functia folosita pentru compararea valorilor nodurilor
 
     def se_creeaza_circuit(self, nod: Nod) -> bool:
+        """TODO"""
+
         curr = self
         while curr is not None:
             if curr.nod == nod:
@@ -21,6 +25,8 @@ class NodParcurgere:
         return False
 
     def expandeaza(self) -> List:
+        """TODO"""
+
         # Genereaza toate combinatiile de deplasamente posibile pentru toti soarecii - folosind un fel de BFS,
         # pentru ca e mai usor de scris + nu e nevoie de recursie
         lista_deplasamente = deque([])
@@ -56,6 +62,7 @@ class NodParcurgere:
             nod_nou.harta.soareci_prinsi_pas_curent = 0
             nod_nou.harta.soareci_mutati_pas_curent = 0
             nod_nou.harta.soarece_iesit_pas_curent = False
+            nod_nou.h = nod_nou.estimeaza_h(nod_nou.euristica)
 
             # Muta animalele conform deplasamentelor
             mutat_soareci = False

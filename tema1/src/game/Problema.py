@@ -1,43 +1,50 @@
+from tema1.src.search.Euristica import Euristica
 from tema1.src.search.Nod import Nod
 from tema1.src.search.NodParcurgere import NodParcurgere
 from tema1.src.utils.EvenimentJoc import EvenimentJoc
 
 
 class Problema:
-    def __init__(self, input_filepath: str, output_filepath: str):
+    def __init__(self, input_filepath: str, output_filepath: str, euristica: Euristica = Euristica.ADMISIBILA2):
+        """TODO"""
+
+        self.euristica = euristica
         self.start, self.k = self._citeste(input_filepath)
         self.output_file = open(output_filepath, "w")  # Inchis in destructor
 
     def _citeste(self, filepath: str):
+        """TODO"""
+
         with open(filepath, "r") as f:
             k = int(f.readline())
 
             map_string = f.read()
             map = [line.split(" ") for line in map_string.split("\n")]
-            start = Nod(map, float("inf"))
+            start = Nod(map, e_nod_start=True, euristica=self.euristica)
 
             return start, k
 
     def sortare_open(self, x):
+        """TODO"""
+
         return x.f, -x.g
 
     def cauta_nod_parcurgere(self, nod_parcurgere: NodParcurgere, lista: [NodParcurgere]):
+        """TODO"""
+
         for x in lista:
             if x.nod == nod_parcurgere.nod:
                 return x
         return None
 
     def e_nod_scop(self, nod: Nod) -> bool:
-        """
-        TODO
-
-        :param nod:
-        :return:
-        """
+        """TODO"""
 
         return nod.harta.soareci_iesiti == self.k
 
     def rezolva(self):
+        """TODO"""
+
         open = []  # Nodurile ce urmeaza sa fie expandate
         closed = []  # Nodurile deja expandate
 
