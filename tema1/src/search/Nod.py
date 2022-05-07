@@ -123,7 +123,7 @@ class Nod:
 
         # dist reala de la punct la soareci mai apropiata iesire
 
-        pass
+        return 1
 
     def __repr__(self) -> str:
         # TODO
