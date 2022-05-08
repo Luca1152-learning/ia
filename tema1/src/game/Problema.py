@@ -86,7 +86,8 @@ class Problema:
             self.durata_algoritm = timer() - algoritm_start
 
             print(
-                f"A* optimizat, euristica {euristica_to_str(self.euristica)} - lungime {self.lungime_drum}" +
+                f"{f'[{self.curr_sol + 1}/{self.n_sol}] ' if self.n_sol > 1 else ''}A* optimizat, "
+                f"euristica {euristica_to_str(self.euristica)} - lungime {self.lungime_drum}" +
                 f" - cost {self.cost_drum} - {self.durata_algoritm:.2f}s - {self.max_noduri_existente} max noduri" +
                 f" - {self.total_noduri_calculate} total noduri"
             )
@@ -119,7 +120,8 @@ class Problema:
                 self.durata_algoritm = algoritm_end - algoritm_start
                 self.cost_drum = nod_curent.g
                 print(
-                    f"A* optimizat, euristica {euristica_to_str(self.euristica)} - lungime {self.lungime_drum}" +
+                    f"{f'[{self.curr_sol + 1}/{self.n_sol}] ' if self.n_sol > 1 else ''}A* optimizat, "
+                    f"euristica {euristica_to_str(self.euristica)} - lungime {self.lungime_drum}" +
                     f" - cost {self.cost_drum} - {self.durata_algoritm:.2f}s - {self.max_noduri_existente} max noduri" +
                     f" - {self.total_noduri_calculate} total noduri"
                 )
@@ -164,7 +166,8 @@ class Problema:
             # Asigura-te ca nu s-a depasit timpul limita
             elapsed = timer() - algoritm_start
             if elapsed > self.timeout:
-                print(f"A* optimizat, euristica {euristica_to_str(self.euristica)} - TIMEOUT")
+                print(f"{f'[{self.curr_sol}/{self.n_sol}]' if self.n_sol > 1 else ''}A* optimizat, " +
+                      f"euristica {euristica_to_str(self.euristica)} - TIMEOUT")
                 return
 
             # Expandeaza nodul curent
