@@ -114,9 +114,7 @@ class Problema:
 
             print(
                 f"{f'[{self.curr_sol + 1}/{self.n_sol}] ' if self.n_sol > 1 else ''}A* optimizat, "
-                f"euristica {euristica_to_str(self.euristica)} - lungime {self.lungime_drum}" +
-                f" - cost {self.cost_drum} - {self.durata_algoritm:.2f}s - {self.max_noduri_existente} max noduri" +
-                f" - {self.total_noduri_calculate} total noduri"
+                f"euristica {euristica_to_str(self.euristica)} - NICIO SOLUTIE"
             )
             return
 
