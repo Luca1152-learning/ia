@@ -1,27 +1,27 @@
 1) g=0
-E  p0 . . s1 . . . . 
-.  .  . . .  . . . . 
-.  .  . . .  . . . . 
-s0 .  . . .  E . . s2
+.  . . s0 . . . p0
+#  E . .  . . . . 
+.  . . .  . . # s2
+s1 # . E  . . # . 
 
 2) g=3
-E  . p0 s1 . . . .  .
-.  . .  .  . . . .  .
-s0 . .  .  . . . .  .
-.  . .  .  . E . s2 .
+.  . . .  . . . . 
+#  E . s0 . . . p0
+s1 . . .  . . # . 
+.  # . E  . . # . 
+Pisica p0 a mancat soarecele s2.
 
-3) g=6
-E  . . p0 s1 . .  . .
-s0 . . .  .  . .  . .
-.  . . .  .  . .  . .
-.  . . .  .  E s2 . .
+3) g=5
+. .  .  . . . .  .
+# E  s0 . . . p0 .
+. s1 .  . . . #  .
+. #  .  E . . #  .
 
-4) g=7
-E . . . .  . . . .
-. . . . p0 . . . .
-. . . . .  . . . .
-. . . . .  E . . .
+4) g=6
+. . . . . . p0 .
+# E . . . . .  .
+. . . . . . #  .
+. # . E . . #  .
 Soarecele s0 a iesit de pe harta.
-Soarecele s2 a iesit de pe harta.
-Pisica p0 a mancat soarecele s1.
+Soarecele s1 a iesit de pe harta.
 

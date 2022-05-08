@@ -1,0 +1,27 @@
+1) g=0
+.  . . s0 . . . p0
+#  E . .  . . . . 
+.  . . .  . . # s2
+s1 # . E  . . # . 
+
+2) g=3
+.  . s0 . . . . . 
+#  E .  . . . . p0
+s1 . .  . . . # . 
+.  # .  E . . # s2
+
+3) g=6
+. s0 . . . . . . 
+# E  . . . . . . 
+. s1 . . . . # p0
+. #  . E . . # . 
+Pisica p0 a mancat soarecele s2.
+
+4) g=7
+. . . . . . . . 
+# E . . . . . p0
+. . . . . . # . 
+. # . E . . # . 
+Soarecele s0 a iesit de pe harta.
+Soarecele s1 a iesit de pe harta.
+
