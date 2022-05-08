@@ -61,7 +61,8 @@ class NodParcurgere:
             nod_nou.harta.soareci_prinsi_pas_curent = 0
             nod_nou.harta.soareci_mutati_pas_curent = 0
             nod_nou.harta.soarece_iesit_pas_curent = False
-            nod_nou.h = nod_nou.estimeaza_h(nod_nou.euristica)
+            if nod_nou.euristica is not None:
+                nod_nou.h = nod_nou.estimeaza_h(nod_nou.euristica)
 
             # Muta animalele conform deplasamentelor
             mutat_soareci = False

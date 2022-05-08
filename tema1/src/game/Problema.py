@@ -1,3 +1,4 @@
+import collections
 from timeit import default_timer as timer
 
 from tema1.src.search.Euristica import Euristica, euristica_to_str
@@ -72,10 +73,124 @@ class Problema:
                 soareci_ce_pot_ajunge_la_iesiri += 1
         return soareci_ce_pot_ajunge_la_iesiri >= self.k
 
+    def afiseaza_solutie(self, nod_scop: NodParcurgere, algoritm_start: float, nume_algoritm: str):
+        """TODO"""
+
+        drum = []
+
+        nod_i = nod_scop
+        while nod_i:
+            drum.append(nod_i)
+            nod_i = nod_i.parinte
+
+        # Statistici
+        self.lungime_drum = len(drum) - 1
+        algoritm_end = timer()
+        self.durata_algoritm = algoritm_end - algoritm_start
+        self.cost_drum = nod_scop.g
+        print(
+            f"{f'[{self.curr_sol + 1}/{self.n_sol}] ' if self.n_sol > 1 else ''}{nume_algoritm}" +
+            (
+                f", euristica {euristica_to_str(self.euristica)}" if self.euristica else "") + f" - lungime {self.lungime_drum}" +
+            f" - cost {self.cost_drum} - {self.durata_algoritm:.2f}s - {self.max_noduri_existente} max noduri" +
+            f" - {self.total_noduri_calculate} total noduri"
+        )
+
+        for index, nod_parcurgere in enumerate(reversed(drum)):
+            harta = nod_parcurgere.nod.harta
+
+            self.output_file.write(f"{index + 1}) g={nod_parcurgere.g}\n")
+
+            # Respecta formatul hartii din enunt, unde lungimea unei coloane depinde de cel mai lung sir de caractere
+            max_str_lengths_per_column = [0 for _ in range(len(harta.harta[0]))]
+            for j in range(len(harta.harta[0])):
+                for i in range(len(harta.harta)):
+                    max_str_lengths_per_column[j] = max(len(harta.harta[i][j]), max_str_lengths_per_column[j])
+            self.output_file.write(
+                "\n".join(
+                    [" ".join([cell.ljust(max_str_lengths_per_column[j], " ") for j, cell in enumerate(line)])
+                     for line in harta.harta]
+                ) + "\n"
+            )
+
+            for eveniment in harta.evenimente:
+                tip = eveniment["tip"]
+                if tip == EvenimentJoc.PISICA_MANCAT_SOARECE:
+                    self.output_file.write(
+                        f"Pisica p{eveniment['id_pisica']} a mancat soarecele s{eveniment['id_soarece']}.\n"
+                    )
+                elif tip == EvenimentJoc.SOARECE_ASCUNS:
+                    self.output_file.write(f"Soarecele s{eveniment['id']} s-a ascuns.\n")
+                elif tip == EvenimentJoc.SOARECE_IESIT_HARTA:
+                    self.output_file.write(f"Soarecele s{eveniment['id']} a iesit de pe harta.\n")
+                elif tip == EvenimentJoc.PISICA_BLOCATA:
+                    self.output_file.write(f"Pisica p{eveniment['id']} nu s-a putut misca.\n")
+                elif tip == EvenimentJoc.SOARECE_BLOCAT:
+                    self.output_file.write(f"Soarecele s{eveniment['id']} nu s-a putut misca.\n")
+            self.output_file.write("\n")
+
     def rezolva_bfs(self):
         """TODO"""
 
-        pass
+        # Statistici
+        algoritm_start = timer()
+
+        # BFS
+        nod_start = NodParcurgere(self.start, None, 0)
+        self.numar_soareci_initial = len(nod_start.nod.harta.soareci)
+
+        # Verificam (relativ naiv) daca se poate ajunge intr-un nod scop, numarand cati soareci pot ajunge la iesiri
+        # si comparand cu k
+        if not self.are_solutie(nod_start):
+            self.lungime_drum = 0
+            self.durata_algoritm = timer() - algoritm_start
+
+            print(
+                f"{f'[{self.curr_sol + 1}/{self.n_sol}] ' if self.n_sol > 1 else ''}BFS - NICIO SOLUTIE"
+            )
+            return
+
+        # Posibil sa avem solutie. Continuam cu BFS
+        q = collections.deque([nod_start])
+        self.total_noduri_calculate = 1
+
+        while q:
+            # Statistici
+            self.max_noduri_existente = max(self.max_noduri_existente, len(q))
+
+            nod_curent = q.popleft()
+
+            # Am gasit un nod scop
+            if self.e_nod_scop(nod_curent.nod):
+                self.afiseaza_solutie(nod_curent, algoritm_start, "BFS")
+
+                self.curr_sol += 1
+                if self.curr_sol == self.n_sol or self.lungime_drum == 0:
+                    return
+                else:
+                    self.output_file.close()
+                    self.output_file = open(f"{self.partial_output_filepath}-{self.curr_sol + 1}.out", "w")
+                    continue
+
+            # Asigura-te ca nu s-a depasit timpul limita
+            elapsed = timer() - algoritm_start
+            if elapsed > self.timeout:
+                print(f"{f'[{self.curr_sol + 1}/{self.n_sol}] ' if self.n_sol > 1 else ''}BFS - TIMEOUT")
+                return
+
+            # Expandeaza nodul curent
+            succesori = nod_curent.expandeaza()
+            self.total_noduri_calculate += len(succesori)
+
+            for succesor in succesori:
+                nod_nou = succesor
+
+                # Cautam succesor in queue
+                nod_in_open = self.cauta_nod_parcurgere(succesor, q)
+                if nod_in_open is not None:
+                    continue
+
+                q.append(nod_nou)
 
     def rezolva_dfs(self):
         """TODO"""
@@ -130,57 +245,7 @@ class Problema:
 
             # Am gasit un nod scop
             if self.e_nod_scop(nod_curent.nod):
-                drum = []
-
-                nod_i = nod_curent
-                while nod_i:
-                    drum.append(nod_i)
-                    nod_i = nod_i.parinte
-
-                # Statistici
-                self.lungime_drum = len(drum) - 1
-                algoritm_end = timer()
-                self.durata_algoritm = algoritm_end - algoritm_start
-                self.cost_drum = nod_curent.g
-                print(
-                    f"{f'[{self.curr_sol + 1}/{self.n_sol}] ' if self.n_sol > 1 else ''}A* optimizat, "
-                    f"euristica {euristica_to_str(self.euristica)} - lungime {self.lungime_drum}" +
-                    f" - cost {self.cost_drum} - {self.durata_algoritm:.2f}s - {self.max_noduri_existente} max noduri" +
-                    f" - {self.total_noduri_calculate} total noduri"
-                )
-
-                for index, nod_parcurgere in enumerate(reversed(drum)):
-                    harta = nod_parcurgere.nod.harta
-
-                    self.output_file.write(f"{index + 1}) g={nod_parcurgere.g}\n")
-
-                    # Respecta formatul hartii din enunt, unde lungimea unei coloane depinde de cel mai lung sir de caractere
-                    max_str_lengths_per_column = [0 for _ in range(len(harta.harta[0]))]
-                    for j in range(len(harta.harta[0])):
-                        for i in range(len(harta.harta)):
-                            max_str_lengths_per_column[j] = max(len(harta.harta[i][j]), max_str_lengths_per_column[j])
-                    self.output_file.write(
-                        "\n".join(
-                            [" ".join([cell.ljust(max_str_lengths_per_column[j], " ") for j, cell in enumerate(line)])
-                             for line in harta.harta]
-                        ) + "\n"
-                    )
-
-                    for eveniment in harta.evenimente:
-                        tip = eveniment["tip"]
-                        if tip == EvenimentJoc.PISICA_MANCAT_SOARECE:
-                            self.output_file.write(
-                                f"Pisica p{eveniment['id_pisica']} a mancat soarecele s{eveniment['id_soarece']}.\n"
-                            )
-                        elif tip == EvenimentJoc.SOARECE_ASCUNS:
-                            self.output_file.write(f"Soarecele s{eveniment['id']} s-a ascuns.\n")
-                        elif tip == EvenimentJoc.SOARECE_IESIT_HARTA:
-                            self.output_file.write(f"Soarecele s{eveniment['id']} a iesit de pe harta.\n")
-                        elif tip == EvenimentJoc.PISICA_BLOCATA:
-                            self.output_file.write(f"Pisica p{eveniment['id']} nu s-a putut misca.\n")
-                        elif tip == EvenimentJoc.SOARECE_BLOCAT:
-                            self.output_file.write(f"Soarecele s{eveniment['id']} nu s-a putut misca.\n")
-                    self.output_file.write("\n")
+                self.afiseaza_solutie(nod_curent, algoritm_start, "A* optimizat")
 
                 self.curr_sol += 1
                 if self.curr_sol == self.n_sol or self.lungime_drum == 0:
@@ -193,7 +258,7 @@ class Problema:
             # Asigura-te ca nu s-a depasit timpul limita
             elapsed = timer() - algoritm_start
             if elapsed > self.timeout:
-                print(f"{f'[{self.curr_sol}/{self.n_sol}]' if self.n_sol > 1 else ''}A* optimizat, " +
+                print(f"{f'[{self.curr_sol + 1}/{self.n_sol}] ' if self.n_sol > 1 else ''}A* optimizat, " +
                       f"euristica {euristica_to_str(self.euristica)} - TIMEOUT")
                 return
 
