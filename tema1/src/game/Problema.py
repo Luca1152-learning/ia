@@ -192,10 +192,66 @@ class Problema:
 
                 q.append(nod_nou)
 
+    def _ruleaza_dfs_recursiv(self, nod_curent: NodParcurgere, algoritm_start, adancime=1):
+        """TODO"""
+
+        self.max_noduri_existente = max(self.max_noduri_existente, adancime)
+
+        # Am gasit un nod scop
+        if self.e_nod_scop(nod_curent.nod):
+            self.afiseaza_solutie(nod_curent, algoritm_start, "DFS")
+
+            self.curr_sol += 1
+            if self.curr_sol == self.n_sol or self.lungime_drum == 0:
+                return
+            else:
+                self.output_file.close()
+                self.output_file = open(f"{self.partial_output_filepath}-{self.curr_sol + 1}.out", "w")
+
+        # Asigura-te ca nu s-a depasit timpul limita
+        elapsed = timer() - algoritm_start
+        if elapsed > self.timeout and not self.dfs_timeout:
+            print(f"{f'[{self.curr_sol + 1}/{self.n_sol}] ' if self.n_sol > 1 else ''}DFS - TIMEOUT")
+            self.dfs_timeout = True
+            return
+
+        # Expandeaza nodul curent
+        succesori = nod_curent.expandeaza()
+        self.total_noduri_calculate += len(succesori)
+
+        if not self.dfs_timeout:
+            for succesor in succesori:
+                self._ruleaza_dfs_recursiv(succesor, algoritm_start, adancime + 1)
+
     def rezolva_dfs(self):
         """TODO"""
 
-        pass
+        # Statistici
+        algoritm_start = timer()
+
+        # DFS
+        nod_start = NodParcurgere(self.start, None, 0)
+        self.numar_soareci_initial = len(nod_start.nod.harta.soareci)
+
+        # Verificam (relativ naiv) daca se poate ajunge intr-un nod scop, numarand cati soareci pot ajunge la iesiri
+        # si comparand cu k
+        if not self.are_solutie(nod_start):
+            self.lungime_drum = 0
+            self.durata_algoritm = timer() - algoritm_start
+
+            print(
+                f"{f'[{self.curr_sol + 1}/{self.n_sol}] ' if self.n_sol > 1 else ''}DFS - NICIO SOLUTIE"
+            )
+            return
+
+        self.total_noduri_calculate = 1
+        self.dfs_timeout = False
+        try:
+            self._ruleaza_dfs_recursiv(nod_start, algoritm_start)
+        except RecursionError:
+            print(
+                f"{f'[{self.curr_sol + 1}/{self.n_sol}] ' if self.n_sol > 1 else ''}DFS - STACK OVERFLOW"
+            )
 
     def rezolva_dfi(self):
         """TODO"""
