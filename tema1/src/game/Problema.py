@@ -15,6 +15,7 @@ class Problema:
         self.timeout = timeout
         self.start, self.k = self._citeste(input_filepath)
         # Fisier inchis in destructor
+        self.partial_output_filepath = partial_output_filepath
         self.output_file = open(f"{partial_output_filepath}{'-1' if n_sol > 1 else ''}.out", "w")
 
         # Statistici
@@ -74,8 +75,8 @@ class Problema:
         algoritm_start = timer()
 
         # A*
-        open = []  # Nodurile ce urmeaza sa fie expandate
-        closed = []  # Nodurile deja expandate
+        open_list = []  # Nodurile ce urmeaza sa fie expandate
+        closed_list = []  # Nodurile deja expandate
         nod_start = NodParcurgere(self.start, None, 0)
         self.numar_soareci_initial = len(nod_start.nod.harta.soareci)
 
@@ -95,15 +96,15 @@ class Problema:
 
         # Posibil sa avem solutie. Continuam cu A*.
 
-        open.append(nod_start)
+        open_list.append(nod_start)
         self.total_noduri_calculate = 1
-        while open:
+        while open_list:
             # Statistici
-            self.max_noduri_existente = max(self.max_noduri_existente, len(open) + len(closed))
+            self.max_noduri_existente = max(self.max_noduri_existente, len(open_list) + len(closed_list))
 
             # Stergem si stocam ultimul element. Nu primul, deoarece open e sortat in ordinea inversa
             # necesara algoritmului - tocmai pentru a putea face pop() rapid
-            nod_curent = open.pop()
+            nod_curent = open_list.pop()
 
             # Am gasit un nod scop
             if self.e_nod_scop(nod_curent.nod):
@@ -162,6 +163,9 @@ class Problema:
                 self.curr_sol += 1
                 if self.curr_sol == self.n_sol or self.lungime_drum == 0:
                     return
+                else:
+                    self.output_file.close()
+                    self.output_file = open(f"{self.partial_output_filepath}-{self.curr_sol + 1}.out", "w")
 
             # Asigura-te ca nu s-a depasit timpul limita
             elapsed = timer() - algoritm_start
@@ -171,7 +175,7 @@ class Problema:
                 return
 
             # Expandeaza nodul curent
-            closed.append(nod_curent)  # Marcheaza-l ca expandat (punandu-l in closed)
+            closed_list.append(nod_curent)  # Marcheaza-l ca expandat (punandu-l in closed)
             succesori = nod_curent.expandeaza()
             self.total_noduri_calculate += len(succesori)
 
@@ -179,24 +183,24 @@ class Problema:
                 nod_nou = succesor
 
                 # Cautam succesor in open
-                nod_in_open = self.cauta_nod_parcurgere(succesor, open)
+                nod_in_open = self.cauta_nod_parcurgere(succesor, open_list)
                 if nod_in_open is not None:
                     # Am gasit un drum mai bun catre succesor
                     if succesor.f < nod_in_open.f:
-                        open.remove(nod_in_open)
+                        open_list.remove(nod_in_open)
                     else:
                         nod_nou = None
 
                 # succesor a fost expandat in trecut
-                nod_in_closed = self.cauta_nod_parcurgere(succesor, closed)
+                nod_in_closed = self.cauta_nod_parcurgere(succesor, closed_list)
                 if nod_in_closed:
-                    closed.remove(nod_in_closed)
+                    closed_list.remove(nod_in_closed)
                     nod_nou = succesor
 
                 if nod_nou is not None:
-                    open.append(nod_nou)
+                    open_list.append(nod_nou)
                     # Sorteaza invers criteriului algoritmului, pentru a putea face pop() rapid
-                    open.sort(key=self.sortare_open, reverse=True)
+                    open_list.sort(key=self.sortare_open, reverse=True)
 
     def __del__(self):
         self.output_file.close()

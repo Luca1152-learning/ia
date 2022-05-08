@@ -83,7 +83,12 @@ class Nod:
             distante.append(self.harta.distante_reale_iesiri[soarece.y][soarece.x])
         distante.sort()
 
-        soarecii_apropiati = distante[0:self.k - self.harta.soareci_iesiti]
+        de_mutat = self.k - self.harta.soareci_iesiti
+        if de_mutat < len(distante) and distante[de_mutat - 1] == distante[de_mutat]:
+            # print("da")
+            return 0
+
+        soarecii_apropiati = distante[0:de_mutat]
         soareci_aceeasi_distanta = len(soarecii_apropiati) - len(set(soarecii_apropiati))
 
         return sum(soarecii_apropiati) - soareci_aceeasi_distanta
