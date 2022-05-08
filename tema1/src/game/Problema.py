@@ -7,13 +7,15 @@ from tema1.src.utils.EvenimentJoc import EvenimentJoc
 
 
 class Problema:
-    def __init__(self, input_filepath: str, output_filepath: str, euristica: Euristica, timeout: float):
+    def __init__(self, input_filepath: str, partial_output_filepath: str, euristica: Euristica, timeout: float,
+                 n_sol: int):
         """TODO"""
 
         self.euristica = euristica
         self.timeout = timeout
         self.start, self.k = self._citeste(input_filepath)
-        self.output_file = open(output_filepath, "w")  # Inchis in destructor
+        # Fisier inchis in destructor
+        self.output_file = open(f"{partial_output_filepath}{'-1' if n_sol > 1 else ''}.out", "w")
 
         # Statistici
         self.lungime_drum = 0
@@ -21,6 +23,8 @@ class Problema:
         self.durata_algoritm = 0
         self.max_noduri_existente = 0
         self.total_noduri_calculate = 0
+        self.n_sol = n_sol
+        self.curr_sol = 0
 
     def _citeste(self, filepath: str):
         """TODO"""
@@ -153,7 +157,9 @@ class Problema:
                             self.output_file.write(f"Soarecele s{eveniment['id']} nu s-a putut misca.\n")
                     self.output_file.write("\n")
 
-                return
+                self.curr_sol += 1
+                if self.curr_sol == self.n_sol or self.lungime_drum == 0:
+                    return
 
             # Asigura-te ca nu s-a depasit timpul limita
             elapsed = timer() - algoritm_start

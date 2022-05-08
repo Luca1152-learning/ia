@@ -31,7 +31,8 @@ def setup_cli():
         # A* optimizat
         for euristica in Euristica:
             p = Problema(
-                input_file_path, f"{args.output}/{file_name}-{euristica_to_str(euristica)}.out", euristica, args.timeout
+                input_file_path, f"{args.output}/{file_name}-{euristica_to_str(euristica)}", euristica, args.timeout,
+                args.n
             )
             p.rezolva()
 
