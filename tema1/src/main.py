@@ -3,18 +3,7 @@ import os
 from pathlib import Path
 
 from tema1.src.game.Problema import Problema
-from tema1.src.search.Euristica import Euristica
-
-
-def euristica_to_str(euristica: Euristica):
-    if euristica == Euristica.BANALA:
-        return "banala"
-    elif euristica == Euristica.ADMISIBILA1:
-        return "admisibila1"
-    elif euristica == Euristica.ADMISIBILA2:
-        return "admisibila2"
-    elif euristica == Euristica.NEADMISIBILA:
-        return "neadmisibila"
+from tema1.src.search.Euristica import Euristica, euristica_to_str
 
 
 def setup_cli():
@@ -38,13 +27,13 @@ def setup_cli():
         input_file_path = args.input + "/" + input_file_name
         file_name = str(Path(input_file_name).stem)
 
+        print(f"[{file_name}]")
+        # A* optimizat
         for euristica in Euristica:
-            p = Problema(input_file_path, f"{args.output}/{file_name}-{euristica_to_str(euristica)}.out", euristica)
+            p = Problema(
+                input_file_path, f"{args.output}/{file_name}-{euristica_to_str(euristica)}.out", euristica, args.timeout
+            )
             p.rezolva()
-
-            print(f"[{file_name}] A* optimizat, euristica {euristica_to_str(euristica)} - lungime {p.lungime_drum}" +
-                  f" - cost {p.cost_drum} - {p.durata_algoritm:.2f}s - {p.max_noduri_existente} max noduri" +
-                  f" - {p.total_noduri_calculate} total noduri")
 
         print()
 

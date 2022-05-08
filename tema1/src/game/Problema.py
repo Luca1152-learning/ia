@@ -1,16 +1,17 @@
 from timeit import default_timer as timer
 
-from tema1.src.search.Euristica import Euristica
+from tema1.src.search.Euristica import Euristica, euristica_to_str
 from tema1.src.search.Nod import Nod
 from tema1.src.search.NodParcurgere import NodParcurgere
 from tema1.src.utils.EvenimentJoc import EvenimentJoc
 
 
 class Problema:
-    def __init__(self, input_filepath: str, output_filepath: str, euristica: Euristica = Euristica.ADMISIBILA2):
+    def __init__(self, input_filepath: str, output_filepath: str, euristica: Euristica, timeout: float):
         """TODO"""
 
         self.euristica = euristica
+        self.timeout = timeout
         self.start, self.k = self._citeste(input_filepath)
         self.output_file = open(output_filepath, "w")  # Inchis in destructor
 
@@ -79,6 +80,12 @@ class Problema:
         if not self.are_solutie(nod_start):
             self.lungime_drum = 0
             self.durata_algoritm = timer() - algoritm_start
+
+            print(
+                f"A* optimizat, euristica {euristica_to_str(self.euristica)} - lungime {self.lungime_drum}" +
+                f" - cost {self.cost_drum} - {self.durata_algoritm:.2f}s - {self.max_noduri_existente} max noduri" +
+                f" - {self.total_noduri_calculate} total noduri"
+            )
             return
 
         # Posibil sa avem solutie. Continuam cu A*.
@@ -107,6 +114,11 @@ class Problema:
                 algoritm_end = timer()
                 self.durata_algoritm = algoritm_end - algoritm_start
                 self.cost_drum = nod_curent.g
+                print(
+                    f"A* optimizat, euristica {euristica_to_str(self.euristica)} - lungime {self.lungime_drum}" +
+                    f" - cost {self.cost_drum} - {self.durata_algoritm:.2f}s - {self.max_noduri_existente} max noduri" +
+                    f" - {self.total_noduri_calculate} total noduri"
+                )
 
                 for index, nod_parcurgere in enumerate(reversed(drum)):
                     harta = nod_parcurgere.nod.harta
@@ -141,6 +153,12 @@ class Problema:
                             self.output_file.write(f"Soarecele s{eveniment['id']} nu s-a putut misca.\n")
                     self.output_file.write("\n")
 
+                return
+
+            # Asigura-te ca nu s-a depasit timpul limita
+            elapsed = timer() - algoritm_start
+            if elapsed > self.timeout:
+                print(f"A* optimizat, euristica {euristica_to_str(self.euristica)} - TIMEOUT")
                 return
 
             # Expandeaza nodul curent
