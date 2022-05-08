@@ -1,6 +1,5 @@
 from timeit import default_timer as timer
 
-from tema1.src.search.Algoritm import Algoritm
 from tema1.src.search.Euristica import Euristica, euristica_to_str
 from tema1.src.search.Nod import Nod
 from tema1.src.search.NodParcurgere import NodParcurgere
@@ -9,13 +8,12 @@ from tema1.src.utils.EvenimentJoc import EvenimentJoc
 
 class Problema:
     def __init__(self, input_filepath: str, partial_output_filepath: str, timeout: float,
-                 n_sol: int, algoritm: Algoritm, euristica: Euristica = None):
+                 n_sol: int, euristica: Euristica = None):
         """TODO"""
 
         # Datele problemei
         self.timeout = timeout
         self.n_sol = n_sol
-        self.algoritm = algoritm
         self.euristica = euristica
 
         # Input

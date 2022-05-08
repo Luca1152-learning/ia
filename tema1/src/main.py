@@ -3,7 +3,6 @@ import os
 from pathlib import Path
 
 from tema1.src.game.Problema import Problema
-from tema1.src.search.Algoritm import Algoritm
 from tema1.src.search.Euristica import Euristica, euristica_to_str
 
 
@@ -31,22 +30,22 @@ def setup_cli():
         print(f"[{file_name}]")
 
         # BFS
-        p = Problema(input_file_path, f"{args.output}/{file_name}-bfs", args.timeout, args.n, Algoritm.BFS)
+        p = Problema(input_file_path, f"{args.output}/{file_name}-bfs", args.timeout, args.n)
         p.rezolva_bfs()
 
         # DFS
-        p = Problema(input_file_path, f"{args.output}/{file_name}-dfs", args.timeout, args.n, Algoritm.DFS)
+        p = Problema(input_file_path, f"{args.output}/{file_name}-dfs", args.timeout, args.n)
         p.rezolva_dfs()
 
         # DFI
-        p = Problema(input_file_path, f"{args.output}/{file_name}-dfi", args.timeout, args.n, Algoritm.BFS)
+        p = Problema(input_file_path, f"{args.output}/{file_name}-dfi", args.timeout, args.n)
         p.rezolva_dfi()
 
         # A*
         for euristica in Euristica:
             p = Problema(
                 input_file_path, f"{args.output}/{file_name}-a*-{euristica_to_str(euristica)}", args.timeout,
-                args.n, Algoritm.A_STAR, euristica
+                args.n, euristica
             )
             p.rezolva_a_star()
 
@@ -54,7 +53,7 @@ def setup_cli():
         for euristica in Euristica:
             p = Problema(
                 input_file_path, f"{args.output}/{file_name}-a*-opt-{euristica_to_str(euristica)}", args.timeout,
-                args.n, Algoritm.A_STAR_OPTIMIZAT, euristica
+                args.n, euristica
             )
             p.rezolva_a_star_optimizat()
 
@@ -62,7 +61,7 @@ def setup_cli():
         for euristica in Euristica:
             p = Problema(
                 input_file_path, f"{args.output}/{file_name}-ida*-{euristica_to_str(euristica)}", args.timeout,
-                args.n, Algoritm.IDA_STAR, euristica
+                args.n, euristica
             )
             p.rezolva_ida_star()
 
