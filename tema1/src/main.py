@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 
 from tema1.src.game.Problema import Problema
+from tema1.src.search.Algoritm import Algoritm
 from tema1.src.search.Euristica import Euristica, euristica_to_str
 
 
@@ -28,13 +29,42 @@ def setup_cli():
         file_name = str(Path(input_file_name).stem)
 
         print(f"[{file_name}]")
+
+        # BFS
+        p = Problema(input_file_path, f"{args.output}/{file_name}-bfs", args.timeout, args.n, Algoritm.BFS)
+        p.rezolva_bfs()
+
+        # DFS
+        p = Problema(input_file_path, f"{args.output}/{file_name}-dfs", args.timeout, args.n, Algoritm.DFS)
+        p.rezolva_dfs()
+
+        # DFI
+        p = Problema(input_file_path, f"{args.output}/{file_name}-dfi", args.timeout, args.n, Algoritm.BFS)
+        p.rezolva_dfi()
+
+        # A*
+        for euristica in Euristica:
+            p = Problema(
+                input_file_path, f"{args.output}/{file_name}-a*-{euristica_to_str(euristica)}", args.timeout,
+                args.n, Algoritm.A_STAR, euristica
+            )
+            p.rezolva_a_star()
+
         # A* optimizat
         for euristica in Euristica:
             p = Problema(
-                input_file_path, f"{args.output}/{file_name}-{euristica_to_str(euristica)}", euristica, args.timeout,
-                args.n
+                input_file_path, f"{args.output}/{file_name}-a*-opt-{euristica_to_str(euristica)}", args.timeout,
+                args.n, Algoritm.A_STAR_OPTIMIZAT, euristica
             )
-            p.rezolva()
+            p.rezolva_a_star_optimizat()
+
+        # IDA*
+        for euristica in Euristica:
+            p = Problema(
+                input_file_path, f"{args.output}/{file_name}-ida*-{euristica_to_str(euristica)}", args.timeout,
+                args.n, Algoritm.IDA_STAR, euristica
+            )
+            p.rezolva_ida_star()
 
         print()
 

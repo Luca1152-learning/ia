@@ -1,5 +1,6 @@
 from timeit import default_timer as timer
 
+from tema1.src.search.Algoritm import Algoritm
 from tema1.src.search.Euristica import Euristica, euristica_to_str
 from tema1.src.search.Nod import Nod
 from tema1.src.search.NodParcurgere import NodParcurgere
@@ -7,14 +8,20 @@ from tema1.src.utils.EvenimentJoc import EvenimentJoc
 
 
 class Problema:
-    def __init__(self, input_filepath: str, partial_output_filepath: str, euristica: Euristica, timeout: float,
-                 n_sol: int):
+    def __init__(self, input_filepath: str, partial_output_filepath: str, timeout: float,
+                 n_sol: int, algoritm: Algoritm, euristica: Euristica = None):
         """TODO"""
 
-        self.euristica = euristica
+        # Datele problemei
         self.timeout = timeout
+        self.n_sol = n_sol
+        self.algoritm = algoritm
+        self.euristica = euristica
+
+        # Input
         self.start, self.k = self._citeste(input_filepath)
-        # Fisier inchis in destructor
+
+        # Output
         self.partial_output_filepath = partial_output_filepath
         self.output_file = open(f"{partial_output_filepath}{'-1' if n_sol > 1 else ''}.out", "w")
 
@@ -24,7 +31,6 @@ class Problema:
         self.durata_algoritm = 0
         self.max_noduri_existente = 0
         self.total_noduri_calculate = 0
-        self.n_sol = n_sol
         self.curr_sol = 0
 
     def _citeste(self, filepath: str):
@@ -68,7 +74,27 @@ class Problema:
                 soareci_ce_pot_ajunge_la_iesiri += 1
         return soareci_ce_pot_ajunge_la_iesiri >= self.k
 
-    def rezolva(self):
+    def rezolva_bfs(self):
+        """TODO"""
+
+        pass
+
+    def rezolva_dfs(self):
+        """TODO"""
+
+        pass
+
+    def rezolva_dfi(self):
+        """TODO"""
+
+        pass
+
+    def rezolva_a_star(self):
+        """TODO"""
+
+        pass
+
+    def rezolva_a_star_optimizat(self):
         """TODO"""
 
         # Statistici
@@ -202,6 +228,11 @@ class Problema:
                     open_list.append(nod_nou)
                     # Sorteaza invers criteriului algoritmului, pentru a putea face pop() rapid
                     open_list.sort(key=self.sortare_open, reverse=True)
+
+    def rezolva_ida_star(self):
+        """TODO"""
+
+        pass
 
     def __del__(self):
         self.output_file.close()
