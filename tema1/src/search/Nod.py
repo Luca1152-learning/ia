@@ -67,7 +67,10 @@ class Nod:
             distante.append(dist_min_iesire)
         distante.sort()
 
-        return sum(distante[0:self.k - self.harta.soareci_iesiti])
+        soarecii_apropiati = distante[0:self.k - self.harta.soareci_iesiti]
+        soareci_aceeasi_distanta = len(soarecii_apropiati) - len(set(soarecii_apropiati))
+
+        return sum(soarecii_apropiati) - soareci_aceeasi_distanta
 
     def h_euristica_admisibila2(self) -> int:
         """TODO"""
@@ -80,14 +83,29 @@ class Nod:
             distante.append(self.harta.distante_reale_iesiri[soarece.y][soarece.x])
         distante.sort()
 
-        return sum(distante[0: self.k - self.harta.soareci_iesiti])
+        soarecii_apropiati = distante[0:self.k - self.harta.soareci_iesiti]
+        soareci_aceeasi_distanta = len(soarecii_apropiati) - len(set(soarecii_apropiati))
+
+        return sum(soarecii_apropiati) - soareci_aceeasi_distanta
 
     def h_euristica_neadmisibila(self) -> int:
         """TODO"""
 
         # dist reala de la punct la soareci mai apropiata iesire
+        suma_distante = 0
+        for soarece in self.harta.soareci:
+            # Soarecele curent a fost prins / a niesit de pe harta - il ignoram
+            if soarece is None:
+                continue
 
-        return 1
+            dist_min_pisica = float("inf")
+            if len(self.harta.pisici) == 0:
+                dist_min_pisica = 0
+            else:
+                for pisica in self.harta.pisici:
+                    dist_min_pisica = min(dist_min_pisica, soarece.distanta_manhattan(pisica))
+            suma_distante += len(self.harta.harta) + len(self.harta.harta[0]) - dist_min_pisica
+        return suma_distante
 
     def __repr__(self) -> str:
         # TODO
@@ -95,4 +113,4 @@ class Nod:
         return "Nod"
 
     def __eq__(self, other) -> bool:
-        return self.harta.soareci_in_aceeasi_pozitie_ca_alta_harta(other.harta)
+        return self.harta.animale_in_aceeasi_pozitie_ca_alta_harta(other.harta)

@@ -341,15 +341,23 @@ class Harta:
             # Actualizam harta, mutand fizic pisica
             self.muta_pisica(index_pisica, deplasament_best)
 
-    def soareci_in_aceeasi_pozitie_ca_alta_harta(self, harta) -> bool:
+    def animale_in_aceeasi_pozitie_ca_alta_harta(self, harta) -> bool:
         """TODO"""
 
+        # Soareci
         if len(self.soareci) != len(harta.soareci):
             return False
-
-        for index_soarece_self, soarece_self in enumerate(self.soareci):
-            soarece_harta = harta.soareci[index_soarece_self]
+        for index_pisica_self, soarece_self in enumerate(self.soareci):
+            soarece_harta = harta.soareci[index_pisica_self]
             if soarece_self != soarece_harta:
+                return False
+
+        # Pisici
+        if len(self.pisici) != len(harta.pisici):
+            return False
+        for index_pisica_self, pisica_self in enumerate(self.pisici):
+            pisica_harta = harta.pisici[index_pisica_self]
+            if pisica_self != pisica_harta:
                 return False
 
         return True
