@@ -166,6 +166,7 @@ class Problema:
                 else:
                     self.output_file.close()
                     self.output_file = open(f"{self.partial_output_filepath}-{self.curr_sol + 1}.out", "w")
+                    continue
 
             # Asigura-te ca nu s-a depasit timpul limita
             elapsed = timer() - algoritm_start

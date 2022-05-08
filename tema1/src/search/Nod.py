@@ -84,9 +84,6 @@ class Nod:
         distante.sort()
 
         de_mutat = self.k - self.harta.soareci_iesiti
-        if de_mutat < len(distante) and distante[de_mutat - 1] == distante[de_mutat]:
-            # print("da")
-            return 0
 
         soarecii_apropiati = distante[0:de_mutat]
         soareci_aceeasi_distanta = len(soarecii_apropiati) - len(set(soarecii_apropiati))

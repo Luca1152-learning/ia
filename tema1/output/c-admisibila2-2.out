@@ -17,16 +17,11 @@ s0 . . .  .  . .  . .
 .  . . .  .  E s2 . .
 
 4) g=7
-E . . . p0 s1 . . .
-. . . . .  .  . . .
-. . . . .  .  . . .
-. . . . .  E  . . .
+E . . . .  . . . .
+. . . . p0 . . . .
+. . . . .  . . . .
+. . . . .  E . . .
 Soarecele s0 a iesit de pe harta.
 Soarecele s2 a iesit de pe harta.
-
-5) g=8
-E . . . . p0 s1 . .
-. . . . . .  .  . .
-. . . . . .  .  . .
-. . . . . E  .  . .
+Pisica p0 a mancat soarecele s1.
 
