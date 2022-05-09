@@ -1,5 +1,6 @@
 import collections
 from timeit import default_timer as timer
+from typing import List
 
 from tema1.src.search.Euristica import Euristica, euristica_to_str
 from tema1.src.search.Nod import Nod
@@ -480,10 +481,104 @@ class Problema:
             # Sorteaza invers criteriului algoritmului, pentru a putea face pop() rapid
             open_list.sort(key=self.sortare_open, reverse=True)
 
+    def _ruleaza_ida_star_recursiv(self, q: List[NodParcurgere], bound: int, algoritm_start):
+        """TODO"""
+
+        if self.ida_timeout or self.curr_sol >= self.n_sol:
+            return
+
+        # Statistici
+        self.max_noduri_existente = max(self.max_noduri_existente, len(q))
+
+        # Stergem si stocam ultimul element. Nu primul, deoarece q e sortat in ordinea inversa
+        # necesara algoritmului - tocmai pentru a putea face pop() rapid
+        nod_curent = q[-1]
+
+        # Am gasit un nod scop
+        if self.e_nod_scop(nod_curent.nod) and nod_curent.nod not in self.ida_star_noduri_scop_excluse:
+            self.afiseaza_solutie(nod_curent, algoritm_start, "IDA*")
+            self.ida_star_noduri_scop_excluse.append(nod_curent.nod)
+
+            self.curr_sol += 1
+            if self.curr_sol == self.n_sol or self.lungime_drum == 0:
+                return
+            else:
+                self.output_file.close()
+                self.output_file = open(f"{self.partial_output_filepath}-{self.curr_sol + 1}.out", "w")
+                return
+
+        f = nod_curent.g + nod_curent.nod.h
+        if f > bound:
+            self.min_exceeded_threshold = min(self.min_exceeded_threshold, f)
+            return
+
+        # Asigura-te ca nu s-a depasit timpul limita
+        elapsed = timer() - algoritm_start
+        if elapsed > self.timeout:
+            print(f"{f'[{self.curr_sol + 1}/{self.n_sol}] ' if self.n_sol > 1 else ''}IDA*, " +
+                  f"euristica {euristica_to_str(self.euristica)} - TIMEOUT")
+            self.ida_timeout = True
+            return
+
+        # Expandeaza nodul curent
+        succesori = nod_curent.expandeaza()
+        self.total_noduri_calculate += len(succesori)
+
+        for succesor in succesori:
+            if self.cauta_nod_parcurgere(succesor, q) is None:
+                q.append(succesor)
+                self._ruleaza_ida_star_recursiv(q, bound, algoritm_start)
+                q.pop()
+
+        # Sorteaza invers criteriului algoritmului, pentru a putea face pop() rapid
+        q.sort(key=self.sortare_open, reverse=True)
+
     def rezolva_ida_star(self):
         """TODO"""
 
-        pass
+        # Statistici
+        algoritm_start = timer()
+
+        # IDA*
+        q = []
+        nod_start = NodParcurgere(self.start, None, 0)
+        self.numar_soareci_initial = len(nod_start.nod.harta.soareci)
+
+        # Verificam (relativ naiv) daca se poate ajunge intr-un nod scop, numarand cati soareci pot ajunge la iesiri
+        # si comparand cu k
+        if not self.are_solutie(nod_start):
+            self.lungime_drum = 0
+            self.durata_algoritm = timer() - algoritm_start
+
+            print(
+                f"{f'[{self.curr_sol + 1}/{self.n_sol}] ' if self.n_sol > 1 else ''}IDA*, "
+                f"euristica {euristica_to_str(self.euristica)} - NICIO SOLUTIE"
+            )
+            return
+
+        # Posibil sa avem solutie. Continuam cu IDA*.
+        q.append(nod_start)
+        bound = nod_start.nod.estimeaza_h(nod_start.nod.euristica)
+        nod_start.nod.h = bound
+        self.total_noduri_calculate = 1
+        self.min_exceeded_threshold = float("inf")
+        self.ida_timeout = False
+        self.ida_star_noduri_scop_excluse = []
+        while True:
+            try:
+                self._ruleaza_ida_star_recursiv(q, bound, algoritm_start)
+                if self.curr_sol > 0 and self.lungime_drum == 0:
+                    break
+            except RecursionError:
+                print(
+                    f"{f'[{self.curr_sol + 1}/{self.n_sol}] ' if self.n_sol > 1 else ''}IDA*, "
+                    f"euristica {euristica_to_str(self.euristica)} - STACK OVERFLOW"
+                )
+                break
+            if self.ida_timeout or self.curr_sol >= self.n_sol:
+                break
+            bound = self.min_exceeded_threshold
+            q = [nod_start]
 
     def __del__(self):
         self.output_file.close()
