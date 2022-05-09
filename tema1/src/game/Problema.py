@@ -476,8 +476,9 @@ class Problema:
 
                 if nod_nou is not None:
                     open_list.append(nod_nou)
-                    # Sorteaza invers criteriului algoritmului, pentru a putea face pop() rapid
-                    open_list.sort(key=self.sortare_open, reverse=True)
+
+            # Sorteaza invers criteriului algoritmului, pentru a putea face pop() rapid
+            open_list.sort(key=self.sortare_open, reverse=True)
 
     def rezolva_ida_star(self):
         """TODO"""
