@@ -25,14 +25,14 @@ Pisica p0 a mancat soarecele s2.
 Soarecele s1 a iesit de pe harta.
 
 5) g=7
-. . .  . .  . . .
-# E s0 . p0 . . .
-. . .  . .  . # .
-. # .  E .  . # .
+. . . .  .  . . .
+# E . .  .  . . .
+. . . s0 p0 . # .
+. # . E  .  . # .
 
 6) g=8
-. . . . p0 . . .
-# E . . .  . . .
+. . . . .  . . .
+# E . . p0 . . .
 . . . . .  . # .
 . # . E .  . # .
 Soarecele s0 a iesit de pe harta.

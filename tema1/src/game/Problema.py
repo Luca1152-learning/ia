@@ -323,7 +323,78 @@ class Problema:
     def rezolva_a_star(self):
         """TODO"""
 
-        pass
+        # Statistici
+        algoritm_start = timer()
+
+        # A*
+        q = []
+        nod_start = NodParcurgere(self.start, None, 0)
+        self.numar_soareci_initial = len(nod_start.nod.harta.soareci)
+
+        # Verificam (relativ naiv) daca se poate ajunge intr-un nod scop, numarand cati soareci pot ajunge la iesiri
+        # si comparand cu k
+        if not self.are_solutie(nod_start):
+            self.lungime_drum = 0
+            self.durata_algoritm = timer() - algoritm_start
+
+            print(
+                f"{f'[{self.curr_sol + 1}/{self.n_sol}] ' if self.n_sol > 1 else ''}A*, "
+                f"euristica {euristica_to_str(self.euristica)} - NICIO SOLUTIE"
+            )
+            return
+
+        # Posibil sa avem solutie. Continuam cu A*.
+
+        q.append(nod_start)
+        self.total_noduri_calculate = 1
+        while q:
+            # Statistici
+            self.max_noduri_existente = max(self.max_noduri_existente, len(q))
+
+            # Stergem si stocam ultimul element. Nu primul, deoarece q e sortat in ordinea inversa
+            # necesara algoritmului - tocmai pentru a putea face pop() rapid
+            nod_curent = q.pop()
+
+            # Am gasit un nod scop
+            if self.e_nod_scop(nod_curent.nod):
+                self.afiseaza_solutie(nod_curent, algoritm_start, "A*")
+
+                self.curr_sol += 1
+                if self.curr_sol == self.n_sol or self.lungime_drum == 0:
+                    return
+                else:
+                    self.output_file.close()
+                    self.output_file = open(f"{self.partial_output_filepath}-{self.curr_sol + 1}.out", "w")
+                    continue
+
+            # Asigura-te ca nu s-a depasit timpul limita
+            elapsed = timer() - algoritm_start
+            if elapsed > self.timeout:
+                print(f"{f'[{self.curr_sol + 1}/{self.n_sol}] ' if self.n_sol > 1 else ''}A*, " +
+                      f"euristica {euristica_to_str(self.euristica)} - TIMEOUT")
+                return
+
+            # Expandeaza nodul curent
+            succesori = nod_curent.expandeaza()
+            self.total_noduri_calculate += len(succesori)
+
+            for succesor in succesori:
+                nod_nou = succesor
+
+                # Cautam succesor in q
+                nod_in_q = self.cauta_nod_parcurgere(succesor, q)
+                if nod_in_q is not None:
+                    # Am gasit un drum mai bun catre succesor
+                    if succesor.f < nod_in_q.f:
+                        q.remove(nod_in_q)
+                    else:
+                        nod_nou = None
+
+                if nod_nou is not None:
+                    q.append(nod_nou)
+
+            # Sorteaza invers criteriului algoritmului, pentru a putea face pop() rapid
+            q.sort(key=self.sortare_open, reverse=True)
 
     def rezolva_a_star_optimizat(self):
         """TODO"""
