@@ -183,14 +183,7 @@ class Problema:
             self.total_noduri_calculate += len(succesori)
 
             for succesor in succesori:
-                nod_nou = succesor
-
-                # Cautam succesor in queue
-                nod_in_open = self.cauta_nod_parcurgere(succesor, q)
-                if nod_in_open is not None:
-                    continue
-
-                q.append(nod_nou)
+                q.append(succesor)
 
     def _ruleaza_dfs_recursiv(self, nod_curent: NodParcurgere, algoritm_start, adancime=1):
         """TODO"""
@@ -198,7 +191,7 @@ class Problema:
         self.max_noduri_existente = max(self.max_noduri_existente, adancime)
 
         # Am gasit un nod scop
-        if self.e_nod_scop(nod_curent.nod):
+        if self.e_nod_scop(nod_curent.nod) and self.curr_sol < self.n_sol:
             self.afiseaza_solutie(nod_curent, algoritm_start, "DFS")
 
             self.curr_sol += 1
