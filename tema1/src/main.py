@@ -6,6 +6,79 @@ from tema1.src.game.Problema import Problema
 from tema1.src.search.Euristica import Euristica, euristica_to_str
 
 
+def input_valid(raw_data: str) -> bool:
+    """TODO"""
+
+    lines = raw_data.split("\n")
+    valid = True
+
+    # Verifica corectitudinea lui k
+    if lines[0].isnumeric():
+        k = int(lines[0])
+    else:
+        k = 0
+        print("[!!] Eroare: k trebuie sa fie un numar.")
+        valid = False
+
+    map = [line.split(" ") for line in lines[1:]]
+
+    # Verifica lungimile liniilor
+    lungime = len(map[0])
+    for index, line in enumerate(map[1:]):
+        if len(line) != lungime:
+            print(f"[!!] Eroare: lungimea liniei {index + 2} este prea {'mare' if len(line) > lungime else 'mica'}")
+            valid = False
+
+    # Verifica indicii pisicilor
+    pisici = []
+    for line in map:
+        for cell in line:
+            if cell.startswith("p"):
+                pisici.append(int(cell[1:]))
+    pisici.sort()
+    if pisici and pisici[0] != 0:
+        pisici = [-1] + pisici
+    for index in range(1, len(pisici)):
+        pisica = pisici[index]
+        if pisica != pisici[index - 1] + 1:
+            for index_lipsa in range(pisici[index - 1] + 1, pisica):
+                print(f"[!!] Eroare: lipseste pisica {index_lipsa}")
+                valid = False
+
+    # Verifica indicii soarecilor
+    soareci = []
+    for line in map:
+        for cell in line:
+            if cell.startswith("s") or cell.startswith("S"):
+                soareci.append(int(cell[1:]))
+    soareci.sort()
+    if soareci and soareci[0] != 0:
+        soareci = [-1] + soareci
+    for index in range(1, len(soareci)):
+        soarece = soareci[index]
+        if soarece != soareci[index - 1] + 1:
+            for index_lipsa in range(soareci[index - 1] + 1, soarece):
+                print(f"[!!] Eroare: lipseste soarecele {index_lipsa}")
+                valid = False
+
+    # Compara numarul de soareci cu k
+    if len(soareci) < k:
+        print(f"[!!] Eroare: k este mai mare decat numarul de soareci de pe harta")
+        valid = False
+
+    # Asigura-te ca toate caracterele de pe harta sunt valide
+    for line in map:
+        for cell in line:
+            if cell not in [".", "@", "#", "E"] and not ((cell.startswith("s") or cell.startswith("S") or
+                                                          cell.startswith("p")) and cell[1:].isnumeric()):
+                print(f"[!!] Eroare: simboulul '{cell}' de pe harta este invalid")
+                valid = False
+    if not valid:
+        print()
+
+    return valid
+
+
 def setup_cli():
     """TODO"""
 
@@ -28,6 +101,9 @@ def setup_cli():
         file_name = str(Path(input_file_name).stem)
 
         print(f"[{file_name}]")
+        with open(input_file_path) as f:
+            if not input_valid(f.read()):
+                continue
 
         # BFS
         p = Problema(input_file_path, f"{args.output}/{file_name}-bfs", args.timeout, args.n)
