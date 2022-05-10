@@ -2,6 +2,9 @@ import argparse
 import re
 from typing import List, Tuple
 
+import pygame
+from pygame import RLEACCEL
+
 from tema1.src.game.Harta import Harta
 
 
@@ -104,13 +107,140 @@ def parseaza_mutari_animale(
                     mutari_soareci[id_soarece] = deplasament
                     break
 
-    return (mutari_soareci, mutari_pisici)
+    return mutari_soareci, mutari_pisici
 
 
 def animeaza_mutari(harta_initiala: Harta, mutari: Tuple[Tuple[int, int], Tuple[int, int]]):
     """TODO"""
 
-    pass
+    # PyGame window
+    pygame.init()
+    win = pygame.display.set_mode((48 * len(harta_initiala.harta[0]), 48 * len(harta_initiala.harta)))
+    pygame.display.set_caption("Animație a problemei 'șoareci și pisici'")
+
+    pisici, soareci = harta_initiala.pisici, harta_initiala.soareci
+
+    # Creeaza sprites
+    grup_obstacole, grup_ascunzatori, grup_iesiri = creeaza_sprites_statice(harta_initiala)
+    soareci, grup_soareci, pisici, grup_pisici = creeaza_sprites_dinamice(harta_initiala)
+
+    run = True
+    while run:
+        pygame.time.delay(100)
+
+        # Verifica daca butonul de X a fost apasat
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+
+        # Update
+        grup_obstacole.update()
+        grup_ascunzatori.update()
+        grup_iesiri.update()
+        grup_soareci.update()
+        grup_pisici.update()
+
+        # Render
+        win.fill((77, 146, 98))
+        grup_obstacole.draw(win)
+        grup_ascunzatori.draw(win)
+        grup_iesiri.draw(win)
+        grup_soareci.draw(win)
+        grup_pisici.draw(win)
+        pygame.display.update()
+
+
+def creeaza_sprites_statice(harta_initiala: Harta):
+    """TODO"""
+
+    obstacole, ascunzatori, iesiri = pygame.sprite.Group(), pygame.sprite.Group(), pygame.sprite.Group()
+
+    for y, line in enumerate(harta_initiala.harta):
+        for x, cell in enumerate(line):
+            if cell == "#":
+                obstacole.add(Obstacol(x, y))
+            elif cell == "@" or cell.startswith("S"):
+                ascunzatori.add(Ascunzatoare(x, y))
+            elif cell == "E":
+                iesiri.add(Iesire(x, y))
+
+    return obstacole, ascunzatori, iesiri
+
+
+def creeaza_sprites_dinamice(harta_initiala: Harta):
+    """TODO"""
+
+    soareci, pisici = [], []
+    grup_soareci, grup_pisici = pygame.sprite.Group(), pygame.sprite.Group()
+
+    for soarece in harta_initiala.soareci:
+        sprite = Soarece(soarece.x, soarece.y)
+        soareci.append(sprite)
+        grup_soareci.add(sprite)
+
+    for pisica in harta_initiala.pisici:
+        sprite = Pisica(pisica.x, pisica.y)
+        pisici.append(sprite)
+        grup_pisici.add(sprite)
+
+    return soareci, grup_soareci, pisici, grup_pisici
+
+
+# Sprites
+TILE_SIZE = 48
+
+
+class StaticSprite(pygame.sprite.Sprite):
+    def __init__(self, img_src: str, map_x: int, map_y: int):
+        """TODO"""
+
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load(img_src).convert_alpha()
+        self.image.set_colorkey((255, 255, 255), RLEACCEL)
+        self.rect = self.image.get_rect()
+        self.rect.x, self.rect.y = TILE_SIZE * map_x, TILE_SIZE * map_y
+
+
+class Obstacol(StaticSprite):
+    def __init__(self, map_x: int, map_y: int):
+        """TODO"""
+
+        StaticSprite.__init__(self, "sprites/obstacol.png", map_x, map_y)
+
+
+class Ascunzatoare(StaticSprite):
+    def __init__(self, map_x: int, map_y: int):
+        """TODO"""
+
+        StaticSprite.__init__(self, "sprites/ascunzatoare.png", map_x, map_y)
+
+
+class Iesire(StaticSprite):
+    def __init__(self, map_x: int, map_y: int):
+        """TODO"""
+
+        StaticSprite.__init__(self, "sprites/iesire.png", map_x, map_y)
+
+
+class DynamicSprite(StaticSprite):
+    def __init__(self, img_src, initial_map_x: int, initial_map_y: int):
+        """TODO"""
+
+        StaticSprite.__init__(self, img_src, initial_map_x, initial_map_y)
+
+
+class Soarece(DynamicSprite):
+    def __init__(self, initial_map_x: int, initial_map_y: int):
+        """TODO"""
+
+        DynamicSprite.__init__(self, "sprites/soarece.png", initial_map_x, initial_map_y)
+
+
+class Pisica(DynamicSprite):
+    def __init__(self, initial_map_x: int, initial_map_y: int):
+        """TODO"""
+
+        DynamicSprite.__init__(self, "sprites/pisica.png", initial_map_x, initial_map_y)
 
 
 setup_cli()
