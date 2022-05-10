@@ -7,7 +7,13 @@ from tema1.src.search.Nod import Nod
 
 class NodParcurgere:
     def __init__(self, nod: Nod, parinte, g: int):
-        """TODO"""
+        """
+        Initializeaza un obiect de tip NodParcurgere (folosit pentru a lega Nod-uri intre ele).
+
+        :param nod: instanta de tip Nod pe care sa o infasoare NodParcurgere
+        :param parinte: parintele Nod-ului din parcurgere
+        :param g: costul necesar pentru a ajunge la nodul curent in parcurgere
+        """
 
         self.nod = nod  # Referinta catre nodul propriu-zis
         self.parinte = parinte  # Parintele nodului din parcurgerea curenta
@@ -15,7 +21,12 @@ class NodParcurgere:
         self.f = self.g + self.nod.h  # Functia folosita pentru compararea valorilor nodurilor
 
     def se_creeaza_circuit(self, nod: Nod) -> bool:
-        """TODO"""
+        """
+        Verifica daca mai exista Nod-ul dat in parintii NodParcurgere-ului curent (creandu-se, astfel, un circuit).
+
+        :param nod: Nodul de verificat
+        :return: True daca se creeaza circuit, False altfel.
+        """
 
         curr = self
         while curr is not None:
@@ -25,7 +36,11 @@ class NodParcurgere:
         return False
 
     def expandeaza(self) -> List:
-        """TODO"""
+        """
+        Genereaza o lista de Noduri Parcurgere ce sunt succesorii Nodului Parcurgere curent.
+
+        :return: o lista cu toti succesori de tip NodParcurgere ai nodului curent.
+        """
 
         # Genereaza toate combinatiile de deplasamente posibile pentru toti soarecii - folosind un fel de BFS,
         # pentru ca e mai usor de scris + nu e nevoie de recursie
@@ -93,6 +108,3 @@ class NodParcurgere:
             mutari.append(NodParcurgere(nod_nou, self, self.g + cost))
 
         return mutari
-
-    def __repr__(self):
-        return "NodParcurgere"

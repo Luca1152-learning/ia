@@ -68,7 +68,11 @@ class Harta:
         return pisici, soareci, ascunzisuri_libere, iesiri
 
     def calculeaza_distante_reale_iesiri(self) -> List[List[int]]:
-        """TODO"""
+        """
+        Pentru fiecare celula de pe harta, se calculeaza distanta fata de cea mai apropiata iesire.
+
+        :return: o matrice cu distantele respective
+        """
 
         distante = [[float("inf") for _ in row] for row in self.harta]
         for iesire in self.iesiri:
@@ -342,7 +346,12 @@ class Harta:
             self.muta_pisica(index_pisica, deplasament_best)
 
     def animale_in_aceeasi_pozitie_ca_alta_harta(self, harta) -> bool:
-        """TODO"""
+        """
+        Verifica daca animalele (= pisici + soareci) de pe harta data sunt aceleasi ca animalele de pe alta harta.
+
+        :param harta: cea de-a doua harta
+        :return: True daca conditia e satisfacuta, False altfel
+        """
 
         # Soareci
         if len(self.soareci) != len(harta.soareci):

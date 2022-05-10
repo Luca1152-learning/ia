@@ -7,7 +7,12 @@ from tema1.src.search.Euristica import Euristica, euristica_to_str
 
 
 def input_valid(raw_data: str) -> bool:
-    """TODO"""
+    """
+    Verifica daca datele dintr-un fisier de input sunt valide.
+
+    :param raw_data: intregul continut (string) al unui fisier de input
+    :return: True daca datele sunt valide, False altfel
+    """
 
     lines = raw_data.split("\n")
     valid = True
@@ -80,7 +85,7 @@ def input_valid(raw_data: str) -> bool:
 
 
 def setup_cli():
-    """TODO"""
+    """Initializeaza Command Line Interface-ul, fiind punctul de start al programului."""
 
     parser = argparse.ArgumentParser(description="Rezolva problema 'Șoareci și pisici'.")
     parser.add_argument("-i", "--input", metavar="PATH",
@@ -94,9 +99,7 @@ def setup_cli():
 
     args = parser.parse_args()
 
-    # TODO check if the paths (input & output) are valid
     for input_file_name in sorted(os.listdir(args.input)):
-        # TODO use path.join
         input_file_path = args.input + "/" + input_file_name
         file_name = str(Path(input_file_name).stem)
 

@@ -1,6 +1,6 @@
 import collections
 from timeit import default_timer as timer
-from typing import List
+from typing import List, Optional, Tuple
 
 from tema1.src.search.Euristica import Euristica, euristica_to_str
 from tema1.src.search.Nod import Nod
@@ -10,8 +10,17 @@ from tema1.src.utils.EvenimentJoc import EvenimentJoc
 
 class Problema:
     def __init__(self, input_filepath: str, partial_output_filepath: str, timeout: float,
-                 n_sol: int, euristica: Euristica = None):
-        """TODO"""
+                 n_sol: int, euristica: Optional[Euristica] = None):
+        """
+        Initializeaza un obiect de tip Problema.
+
+        :param input_filepath: calea catre fisierul de input
+        :param partial_output_filepath: parte din calea catre fisierul de output, a se completa cu numarul solutiei si
+        extensia
+        :param timeout: in cat timp sa se opreasca executia algoritmului
+        :param n_sol: numarul de solutii de generat
+        :param euristica: ce euristica sa fie folosita, in caz ca se foloseste un algoritm de tip best first
+        """
 
         # Datele problemei
         self.timeout = timeout
@@ -33,8 +42,13 @@ class Problema:
         self.total_noduri_calculate = 0
         self.curr_sol = 0
 
-    def _citeste(self, filepath: str):
-        """TODO"""
+    def _citeste(self, filepath: str) -> Tuple[Nod, int]:
+        """
+        Citeste fisierul de input de la calea data.
+
+        :param filepath: calea fisierului de input
+        :return: un tuplu cu Nod-ul de start si valoarea lui k
+        """
 
         with open(filepath, "r") as f:
             k = int(f.readline())
@@ -45,13 +59,24 @@ class Problema:
 
             return start, k
 
-    def sortare_open(self, x):
-        """TODO"""
+    def sortare_open(self, x: NodParcurgere) -> Tuple[int, int]:
+        """
+        Criteriul de sortare pentru lista OPEN.
+
+        :param x: Nodul Parcurgere caruia sa ii atribuim o valoare
+        :return: un tuplu cu criteriul corespunzator de sortare care sa fie folosit
+        """
 
         return x.f, -x.g
 
-    def cauta_nod_parcurgere(self, nod_parcurgere: NodParcurgere, lista: [NodParcurgere]):
-        """TODO"""
+    def cauta_nod_parcurgere(self, nod_parcurgere: NodParcurgere, lista: [NodParcurgere]) -> Optional[NodParcurgere]:
+        """
+        Verifica existenta unui Nod Parcurgere intr-o lista de Noduri Parcurgere, comparandu-se Nod-urile acestora.
+
+        :param nod_parcurgere: Nodul Parcurgere de gasit
+        :param lista: lista de Noduri Parcurgere de cautat
+        :return: obiectul de tip NodParcurgere gasit sau None daca nu a fost gasit
+        """
 
         for x in lista:
             if x.nod == nod_parcurgere.nod:
@@ -59,12 +84,22 @@ class Problema:
         return None
 
     def e_nod_scop(self, nod: Nod) -> bool:
-        """TODO"""
+        """
+        Verifica daca Nod-ul dat ca parametru este unul de tip scop.
+
+        :param nod: Nod-ul de verificat
+        :return: True daca este de tip scop, False altfel
+        """
 
         return nod.harta.soareci_iesiti == self.k
 
     def are_solutie(self, nod_start: NodParcurgere) -> bool:
-        """TODO"""
+        """
+        Verifica daca, plecandu-se din nodul de start dat, se poate ajunge la un nod scop.
+
+        :param nod_start: nodul de start care sa fie verificat
+        :return: True daca problema poate avea solutie, False altfel
+        """
 
         harta = nod_start.nod.harta
 
@@ -74,8 +109,14 @@ class Problema:
                 soareci_ce_pot_ajunge_la_iesiri += 1
         return soareci_ce_pot_ajunge_la_iesiri >= self.k
 
-    def afiseaza_solutie(self, nod_scop: NodParcurgere, algoritm_start: float, nume_algoritm: str):
-        """TODO"""
+    def afiseaza_solutie(self, nod_scop: NodParcurgere, algoritm_start, nume_algoritm: str):
+        """
+        Scrie output-ul corespunzator drumului la nodul scop gasit.
+
+        :param nod_scop: nodul scop gasit
+        :param algoritm_start: un timer cu momentul in care s-a inceput executia algoritmului
+        :param nume_algoritm: numele algoritmului folosit, ce va fi scris in consola
+        """
 
         drum = []
 
@@ -131,7 +172,7 @@ class Problema:
             self.output_file.write("\n")
 
     def rezolva_bfs(self):
-        """TODO"""
+        """Rezolva Problema data folosind un algoritm de tip BFS."""
 
         # Statistici
         algoritm_start = timer()
@@ -187,7 +228,13 @@ class Problema:
                 q.append(succesor)
 
     def _ruleaza_dfs_recursiv(self, nod_curent: NodParcurgere, algoritm_start, adancime=1):
-        """TODO"""
+        """
+        Recursia unui algoritm DFS ce rezolva Problema data.
+
+        :param nod_curent: nodul curent din parcurgere
+        :param algoritm_start: un timer cu momentul in care s-a inceput executia algoritmului
+        :param adancime: adancimea curenta a nodului din parcurgere
+        """
 
         self.max_noduri_existente = max(self.max_noduri_existente, adancime)
 
@@ -218,7 +265,7 @@ class Problema:
                 self._ruleaza_dfs_recursiv(succesor, algoritm_start, adancime + 1)
 
     def rezolva_dfs(self):
-        """TODO"""
+        """Rezolva Problema data folosind un algoritm de tip DFS."""
 
         # Statistici
         algoritm_start = timer()
@@ -251,7 +298,14 @@ class Problema:
             self, nod_curent: NodParcurgere, algoritm_start: NodParcurgere, adancime: int = 1,
             max_adancime=float("inf")
     ):
-        """TODO"""
+        """
+        Recursia unui algoritm DFI ce rezolva Problema data.
+
+        :param nod_curent: nodul curent din parcurgere
+        :param algoritm_start: un timer cu momentul in care s-a inceput executia algoritmului
+        :param adancime: adancimea curenta a nodului din parcurgere
+        :param max_adancime: adancimea maxima a pasului curent din algoritm
+        """
 
         if adancime > max_adancime or self.curr_sol >= self.n_sol:
             return
@@ -287,7 +341,7 @@ class Problema:
                 self._ruleaza_dfi_recursiv(succesor, algoritm_start, adancime + 1, max_adancime=max_adancime)
 
     def rezolva_dfi(self):
-        """TODO"""
+        """Rezolva Problema data folosind un algoritm de tip DFI."""
 
         # Statistici
         algoritm_start = timer()
@@ -322,7 +376,7 @@ class Problema:
             )
 
     def rezolva_a_star(self):
-        """TODO"""
+        """Rezolva Problema data folosind un algoritm de tip A*."""
 
         # Statistici
         algoritm_start = timer()
@@ -398,7 +452,7 @@ class Problema:
             q.sort(key=self.sortare_open, reverse=True)
 
     def rezolva_a_star_optimizat(self):
-        """TODO"""
+        """Rezolva Problema data folosind un algoritm de tip A* optimizat."""
 
         # Statistici
         algoritm_start = timer()
@@ -482,7 +536,13 @@ class Problema:
             open_list.sort(key=self.sortare_open, reverse=True)
 
     def _ruleaza_ida_star_recursiv(self, q: List[NodParcurgere], bound: int, algoritm_start):
-        """TODO"""
+        """
+        Recursia unui algoritm IDA* ce rezolva Problema data.
+
+        :param q: lista cu nodurile din parcurgerea curenta
+        :param bound: costul maxim al unui nod permis in pasul curent al algoritmului
+        :param algoritm_start: un timer cu momentul in care s-a inceput executia algoritmului
+        """
 
         if self.ida_timeout or self.curr_sol >= self.n_sol:
             return
@@ -534,7 +594,7 @@ class Problema:
         q.sort(key=self.sortare_open, reverse=True)
 
     def rezolva_ida_star(self):
-        """TODO"""
+        """Rezolva Problema data folosind un algoritm de tip IDA*."""
 
         # Statistici
         algoritm_start = timer()

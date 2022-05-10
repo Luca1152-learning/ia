@@ -50,10 +50,12 @@ class Nod:
         return 1
 
     def h_euristica_admisibila1(self) -> int:
-        """TODO"""
+        """
+        Prima euristica admisibila pentru un algoritm de tip "best first". H-ul este estimat a fi suma distantelor
+        Manhattan dintre soareci si cele mai apropiate iesiri de acestia.
 
-        # suma dist manhattan catre cel mai apropiat finish
-        # handle case ajung in acelasi timp la finish => cost 1
+        :return: valorea estimata a lui h
+        """
 
         distante = []
         for soarece in self.harta.soareci:
@@ -73,7 +75,12 @@ class Nod:
         return sum(soarecii_apropiati) - soareci_aceeasi_distanta
 
     def h_euristica_admisibila2(self) -> int:
-        """TODO"""
+        """
+        A doua euristica admisibila pentru un algoritm de tip "best first". H-ul este estimat a fi suma distantelor
+        reale dintre soareci si cele mai apropiate iesiri de acestia.
+
+        :return: valorea estimata a lui h
+        """
 
         distante = []
         for soarece in self.harta.soareci:
@@ -91,7 +98,12 @@ class Nod:
         return sum(soarecii_apropiati) - soareci_aceeasi_distanta
 
     def h_euristica_neadmisibila(self) -> int:
-        """TODO"""
+        """
+        Exemplu de euristica neadmisibila pentru un algoritm de tip "best first". H-ul este estimat a fi suma distantelor
+        Manhattan dintre soareci si cele mai apropiate pisici de acestia.
+
+        :return: valorea estimata a lui h
+        """
 
         # dist reala de la punct la soareci mai apropiata iesire
         suma_distante = 0
@@ -108,11 +120,6 @@ class Nod:
                     dist_min_pisica = min(dist_min_pisica, soarece.distanta_manhattan(pisica))
             suma_distante += len(self.harta.harta) + len(self.harta.harta[0]) - dist_min_pisica
         return suma_distante
-
-    def __repr__(self) -> str:
-        # TODO
-
-        return "Nod"
 
     def __eq__(self, other) -> bool:
         return self.harta.animale_in_aceeasi_pozitie_ca_alta_harta(other.harta)
