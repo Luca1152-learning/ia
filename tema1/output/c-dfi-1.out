@@ -1,21 +1,21 @@
 1) g=0
 .  . . s0 . . . p0
 #  E . .  . . . . 
-.  . . .  . . # s2
-s1 # . E  . . # . 
+.  . . .  . . # s1
+s2 # . E  . . # . 
 
 2) g=3
 .  . s0 . . . . . 
 #  E .  . . . . p0
-s1 . .  . . . # . 
-.  # .  E . . # s2
+s2 . .  . . . # . 
+.  # .  E . . # s1
 
 3) g=6
 . s0 . . . . . . 
 # E  . . . . . . 
-. s1 . . . . # p0
+. s2 . . . . # p0
 . #  . E . . # . 
-Pisica p0 a mancat soarecele s2.
+Pisica p0 a mancat soarecele s1.
 
 4) g=7
 . . . . . . . . 
@@ -23,5 +23,5 @@ Pisica p0 a mancat soarecele s2.
 . . . . . . # . 
 . # . E . . # . 
 Soarecele s0 a iesit de pe harta.
-Soarecele s1 a iesit de pe harta.
+Soarecele s2 a iesit de pe harta.
 

@@ -1,32 +1,32 @@
 1) g=0
 .  . . s0 . . . p0
 #  E . .  . . . . 
-.  . . .  . . # s2
-s1 # . E  . . # . 
+.  . . .  . . # s1
+s2 # . E  . . # . 
 
 2) g=3
 .  . s0 . . . . . 
 #  E .  . . . . p0
-s1 . .  . . . # . 
+s2 . .  . . . # . 
 .  # .  E . . # . 
-Pisica p0 a mancat soarecele s2.
+Pisica p0 a mancat soarecele s1.
 
 3) g=5
 .  s0 . . . . p0 .
 #  E  . . . . .  .
 .  .  . . . . #  .
-s1 #  . E . . #  .
+s2 #  . E . . #  .
 
 4) g=7
 s0 . . . . p0 . .
 #  E . . . .  . .
-s1 . . . . .  # .
+s2 . . . . .  # .
 .  # . E . .  # .
 
 5) g=9
 . s0 . . p0 . . .
 # E  . . .  . . .
-. s1 . . .  . # .
+. s2 . . .  . # .
 . #  . E .  . # .
 
 6) g=10
@@ -35,5 +35,5 @@ s1 . . . . .  # .
 . . . .  . . # .
 . # . E  . . # .
 Soarecele s0 a iesit de pe harta.
-Soarecele s1 a iesit de pe harta.
+Soarecele s2 a iesit de pe harta.
 
