@@ -1,6 +1,7 @@
 import argparse
+import math
 import re
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 
 import pygame
 from pygame import RLEACCEL
@@ -61,7 +62,7 @@ def imparte_in_pasi(raw_input: str) -> List[Tuple[Harta, List[str]]]:
 
 def parseaza_mutari_animale(
         pas_prev: Tuple[Harta, List[str]], pas_curr: Tuple[Harta, List[str]]
-) -> Tuple[Tuple[int, int], Tuple[int, int]]:
+) -> Tuple[Dict[int, Tuple[int, int]], Dict[int, Tuple[int, int]]]:
     """TODO"""
 
     mutari_soareci, mutari_pisici = {}, {}
@@ -110,7 +111,7 @@ def parseaza_mutari_animale(
     return mutari_soareci, mutari_pisici
 
 
-def animeaza_mutari(harta_initiala: Harta, mutari: Tuple[Tuple[int, int], Tuple[int, int]]):
+def animeaza_mutari(harta_initiala: Harta, mutari: List[Tuple[Dict[int, Tuple[int, int]], Dict[int, Tuple[int, int]]]]):
     """TODO"""
 
     # PyGame window
@@ -118,11 +119,19 @@ def animeaza_mutari(harta_initiala: Harta, mutari: Tuple[Tuple[int, int], Tuple[
     win = pygame.display.set_mode((48 * len(harta_initiala.harta[0]), 48 * len(harta_initiala.harta)))
     pygame.display.set_caption("Animație a problemei 'șoareci și pisici'")
 
-    pisici, soareci = harta_initiala.pisici, harta_initiala.soareci
-
     # Creeaza sprites
     grup_obstacole, grup_ascunzatori, grup_iesiri = creeaza_sprites_statice(harta_initiala)
     soareci, grup_soareci, pisici, grup_pisici = creeaza_sprites_dinamice(harta_initiala)
+
+    last_movement_index = 0
+    last_mouse_movement_index = 0
+    mouse_to_move_id = list(mutari[last_movement_index][0].items())[last_mouse_movement_index][0]
+    last_cat_movement_index = -1
+    cat_to_move_id = 0
+    soareci[0].smoothly_move_to(
+        soareci[0].rect.x / TILE_SIZE + mutari[last_movement_index][0][mouse_to_move_id][0],
+        soareci[0].rect.y / TILE_SIZE + mutari[last_movement_index][0][mouse_to_move_id][1]
+    )
 
     run = True
     while run:
@@ -132,6 +141,46 @@ def animeaza_mutari(harta_initiala: Harta, mutari: Tuple[Tuple[int, int], Tuple[
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+
+        # Planifica noi mutari
+        # Muta soarecii
+        if not soareci[mouse_to_move_id].is_moving and last_mouse_movement_index < len(
+                mutari[last_movement_index][0]) - 1:
+            last_mouse_movement_index += 1
+            mouse_to_move_id = list(mutari[last_movement_index][0].items())[last_mouse_movement_index][0]
+            soareci[mouse_to_move_id].smoothly_move_to(
+                soareci[mouse_to_move_id].rect.x / TILE_SIZE + mutari[last_movement_index][0][mouse_to_move_id][0],
+                soareci[mouse_to_move_id].rect.y / TILE_SIZE + mutari[last_movement_index][0][mouse_to_move_id][1]
+            )
+        # Verifica daca ultimul soarece a ajuns intr-un punct de iesire
+        if (mouse_to_move_id > -1 and not soareci[mouse_to_move_id].is_moving and
+                harta_initiala.harta[int(soareci[mouse_to_move_id].rect.y / TILE_SIZE)][
+                    int(soareci[mouse_to_move_id].rect.x / TILE_SIZE)] == "E"):
+            soareci[mouse_to_move_id].kill()
+        # Muta pisicile, daca s-au mutat toti soarecii
+        if (last_mouse_movement_index == len(mutari[last_movement_index][0]) - 1 and
+                not soareci[mouse_to_move_id].is_moving and
+                last_cat_movement_index < len(mutari[last_movement_index][1]) - 1):
+            last_cat_movement_index += 1
+            cat_to_move_id = list(mutari[last_movement_index][1].items())[last_cat_movement_index][0]
+            pisici[cat_to_move_id].smoothly_move_to(
+                pisici[cat_to_move_id].rect.x / TILE_SIZE + mutari[last_movement_index][1][cat_to_move_id][0],
+                pisici[cat_to_move_id].rect.y / TILE_SIZE + mutari[last_movement_index][1][cat_to_move_id][1]
+            )
+        # Verifica daca ultima pisica a prins un soarece
+        if cat_to_move_id > -1 and not pisici[cat_to_move_id].is_moving:
+            for soarece in soareci:
+                if soarece.rect.x == pisici[cat_to_move_id].rect.x and soarece.rect.y == pisici[cat_to_move_id].rect.y:
+                    soarece.kill()
+        # Trece la urmatorul pas, daca s-au mutat toate pisicile si toti soarecii de la pasul curent:
+        if (last_mouse_movement_index == len(mutari[last_movement_index][0]) - 1 and last_cat_movement_index == len(
+                mutari[last_movement_index][1]) - 1 and not pisici[
+            cat_to_move_id].is_moving and last_movement_index < len(mutari) - 1):
+            last_movement_index += 1
+            mouse_to_move_id = -1
+            last_mouse_movement_index = -1
+            cat_to_move_id = -1
+            last_cat_movement_index = -1
 
         # Update
         grup_obstacole.update()
@@ -190,6 +239,12 @@ def creeaza_sprites_dinamice(harta_initiala: Harta):
 TILE_SIZE = 48
 
 
+def sign(x):
+    """TODO"""
+
+    return math.copysign(1, x)
+
+
 class StaticSprite(pygame.sprite.Sprite):
     def __init__(self, img_src: str, map_x: int, map_y: int):
         """TODO"""
@@ -199,6 +254,9 @@ class StaticSprite(pygame.sprite.Sprite):
         self.image.set_colorkey((255, 255, 255), RLEACCEL)
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = TILE_SIZE * map_x, TILE_SIZE * map_y
+
+    def sprite_pos_to_map_pos(self):
+        return self.rect.x / TILE_SIZE, self.rect.y / TILE_SIZE
 
 
 class Obstacol(StaticSprite):
@@ -227,6 +285,22 @@ class DynamicSprite(StaticSprite):
         """TODO"""
 
         StaticSprite.__init__(self, img_src, initial_map_x, initial_map_y)
+        self.target_x, self.target_y = None, None
+        self.is_moving = False
+
+    def smoothly_move_to(self, map_target_x, map_target_y):
+        self.target_x = TILE_SIZE * map_target_x
+        self.target_y = TILE_SIZE * map_target_y
+        self.is_moving = True
+
+    def update(self):
+        if self.target_y is not None and self.target_y is not None:
+            if self.rect.x != self.target_x or self.rect.y != self.target_y:
+                self.rect.x += 12 * sign(self.target_x - self.rect.x)
+                self.rect.y += 12 * sign(self.target_y - self.rect.y)
+            else:
+                self.target_x = self.target_y = None
+                self.is_moving = False
 
 
 class Soarece(DynamicSprite):
