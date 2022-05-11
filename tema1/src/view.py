@@ -31,7 +31,12 @@ def setup_cli():
 
 
 def imparte_in_pasi(raw_input: str) -> List[Tuple[Harta, List[str]]]:
-    """TODO"""
+    """
+    Imparte input-ul raw in cei n pasi ai solutiei.
+
+    :param raw_input: string cu inputul raw
+    :return: o lista de tupluri ce contin harta de la pasul curent si o lista cu evenimente
+    """
 
     pasi_raw = raw_input.split("\n\n")
     pasi = []
@@ -63,7 +68,13 @@ def imparte_in_pasi(raw_input: str) -> List[Tuple[Harta, List[str]]]:
 def parseaza_mutari_animale(
         pas_prev: Tuple[Harta, List[str]], pas_curr: Tuple[Harta, List[str]]
 ) -> Tuple[Dict[int, Tuple[int, int]], Dict[int, Tuple[int, int]]]:
-    """TODO"""
+    """
+    Obtine deplasamentele animalelor de la un pas la altul.
+
+    :param pas_prev: pasul precedent celui curent
+    :param pas_curr: pasul curent
+    :return: un tuplu format din deplasamentele soarecilor si deplasamentele animalelor
+    """
 
     mutari_soareci, mutari_pisici = {}, {}
 
@@ -112,7 +123,12 @@ def parseaza_mutari_animale(
 
 
 def animeaza_mutari(harta_initiala: Harta, mutari: List[Tuple[Dict[int, Tuple[int, int]], Dict[int, Tuple[int, int]]]]):
-    """TODO"""
+    """
+    Animeaza mutarile folosind pygame.
+
+    :param harta_initiala: cum arata harta la inceput
+    :param mutari: mutarile animalelor
+    """
 
     # PyGame window
     pygame.init()
@@ -199,8 +215,13 @@ def animeaza_mutari(harta_initiala: Harta, mutari: List[Tuple[Dict[int, Tuple[in
         pygame.display.update()
 
 
-def creeaza_sprites_statice(harta_initiala: Harta):
-    """TODO"""
+def creeaza_sprites_statice(harta_initiala: Harta) -> Tuple:
+    """
+    Creeaza sprite-uri pentru obstacole, ascunzatori si iesiri.
+
+    :param harta_initiala: cum arata harta la inceput
+    :return: un tuplu cu cele trei grupuri de sprite-uri corespunzatoare
+    """
 
     obstacole, ascunzatori, iesiri = pygame.sprite.Group(), pygame.sprite.Group(), pygame.sprite.Group()
 
@@ -216,8 +237,13 @@ def creeaza_sprites_statice(harta_initiala: Harta):
     return obstacole, ascunzatori, iesiri
 
 
-def creeaza_sprites_dinamice(harta_initiala: Harta):
-    """TODO"""
+def creeaza_sprites_dinamice(harta_initiala: Harta) -> Tuple:
+    """
+    Creeaza sprite-uri pentru soareci si pisici.
+
+    :param harta_initiala: cum arata harta la inceput
+    :return: un tuplu cu soarecii, grupul de soareci, pisicile si grupul de pisici
+    """
 
     soareci, pisici = [], []
     grup_soareci, grup_pisici = pygame.sprite.Group(), pygame.sprite.Group()
@@ -239,15 +265,26 @@ def creeaza_sprites_dinamice(harta_initiala: Harta):
 TILE_SIZE = 48
 
 
-def sign(x):
-    """TODO"""
+def sign(x) -> int:
+    """
+    Calculeaza semnul lui x.
+
+    :param x: numarul caruia sa ii determinam semnul
+    :return: semnul lui x
+    """
 
     return math.copysign(1, x)
 
 
 class StaticSprite(pygame.sprite.Sprite):
     def __init__(self, img_src: str, map_x: int, map_y: int):
-        """TODO"""
+        """
+        Initializeaza un obiect de tip sprite static.
+
+        :param img_src: imaginea de la baza sprite-ului
+        :param map_x: coordonata x de pe harta a sprite-ului
+        :param map_y: coordonata y de pe harta a sprite-ului
+        """
 
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load(img_src).convert_alpha()
@@ -255,45 +292,71 @@ class StaticSprite(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = TILE_SIZE * map_x, TILE_SIZE * map_y
 
-    def sprite_pos_to_map_pos(self):
-        return self.rect.x / TILE_SIZE, self.rect.y / TILE_SIZE
-
 
 class Obstacol(StaticSprite):
     def __init__(self, map_x: int, map_y: int):
-        """TODO"""
+        """
+        Creeaza un sprite de tip Obstacol.
+
+        :param map_x: coordonata x de pe harta a sprite-ului
+        :param map_y: coordonata y de pe harta a sprite-ului
+        """
 
         StaticSprite.__init__(self, "sprites/obstacol.png", map_x, map_y)
 
 
 class Ascunzatoare(StaticSprite):
     def __init__(self, map_x: int, map_y: int):
-        """TODO"""
+        """
+        Creeaza un sprite de tip Ascunzatoare.
+
+        :param map_x: coordonata x de pe harta a sprite-ului
+        :param map_y: coordonata y de pe harta a sprite-ului
+        """
 
         StaticSprite.__init__(self, "sprites/ascunzatoare.png", map_x, map_y)
 
 
 class Iesire(StaticSprite):
     def __init__(self, map_x: int, map_y: int):
-        """TODO"""
+        """
+        Creeaza un sprite de tip Iesire.
+
+        :param map_x: coordonata x de pe harta a sprite-ului
+        :param map_y: coordonata y de pe harta a sprite-ului
+        """
 
         StaticSprite.__init__(self, "sprites/iesire.png", map_x, map_y)
 
 
 class DynamicSprite(StaticSprite):
     def __init__(self, img_src, initial_map_x: int, initial_map_y: int):
-        """TODO"""
+        """
+        Initializeaza un obiect de tip sprite dinamic.
+
+        :param img_src: imaginea de la baza sprite-ului
+        :param initial_map_x: coordonata initiala x de pe harta a sprite-ului
+        :param initial_map_y: coordonata initiala y de pe harta a sprite-ului
+        """
 
         StaticSprite.__init__(self, img_src, initial_map_x, initial_map_y)
         self.target_x, self.target_y = None, None
         self.is_moving = False
 
-    def smoothly_move_to(self, map_target_x, map_target_y):
+    def smoothly_move_to(self, map_target_x: int, map_target_y: int):
+        """
+        Muta sprite-ul la coordonatele hartii date.
+
+        :param map_target_x: coordonata x a hartii
+        :param map_target_y: coordonata y a hartii
+        """
+
         self.target_x = TILE_SIZE * map_target_x
         self.target_y = TILE_SIZE * map_target_y
         self.is_moving = True
 
     def update(self):
+        """Actualizeaza sprite-ul dinamic, mutandu-l, daca este nevoie."""
         if self.target_y is not None and self.target_y is not None:
             if self.rect.x != self.target_x or self.rect.y != self.target_y:
                 self.rect.x += 12 * sign(self.target_x - self.rect.x)
@@ -305,14 +368,24 @@ class DynamicSprite(StaticSprite):
 
 class Soarece(DynamicSprite):
     def __init__(self, initial_map_x: int, initial_map_y: int):
-        """TODO"""
+        """
+        Creeaza un sprite de tip Soarece.
+
+        :param initial_map_x: coordonata initiala x de pe harta a sprite-ului
+        :param initial_map_y: coordonata initiala y de pe harta a sprite-ului
+        """
 
         DynamicSprite.__init__(self, "sprites/soarece.png", initial_map_x, initial_map_y)
 
 
 class Pisica(DynamicSprite):
     def __init__(self, initial_map_x: int, initial_map_y: int):
-        """TODO"""
+        """
+        Creeaza un sprite de tip Pisica.
+
+        :param initial_map_x: coordonata initiala x de pe harta a sprite-ului
+        :param initial_map_y: coordonata initiala y de pe harta a sprite-ului
+        """
 
         DynamicSprite.__init__(self, "sprites/pisica.png", initial_map_x, initial_map_y)
 
