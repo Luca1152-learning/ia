@@ -55,7 +55,7 @@ class NodParcurgere:
         return False
 
     def expandeaza(self) -> list:
-        # # Miscarile posibile din starea curenta sunt sa interschimbam vecinii blocului liber cu acesta
+        # Miscarile posibile din starea curenta sunt sa interschimbam vecinii blocului liber cu acesta
 
         miscari = []
 
