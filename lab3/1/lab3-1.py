@@ -1,6 +1,8 @@
 import copy
+import os
 from typing import Optional, List, Tuple
 
+__location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
 class Nod:
     def __init__(self, stive: List[List[int]], h=None):
@@ -203,5 +205,5 @@ class Problema:
 
 
 p = Problema()
-p.citeste("lab3-1.in")
+p.citeste(os.path.join(__location__, "lab3-1.in"))
 p.rezolva()

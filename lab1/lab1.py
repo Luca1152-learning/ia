@@ -1,5 +1,8 @@
+import os
 import random
 import time
+
+__location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
 
 def clamp(value, min_value, max_value):
@@ -155,7 +158,7 @@ def porneste_simulare():
             print()
 
 
-activitati = Activitate.read_from_file("lab1.in")
+activitati = Activitate.read_from_file(os.path.join(__location__, "lab1.in"))
 
 # invatat, citit, relaxare, citit, citit
 activitati_elev = [activitati[0], activitati[7], activitati[8], activitati[7], activitati[7]]

@@ -1,3 +1,8 @@
+import os
+
+__location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+
+
 class Nod:
     def __init__(self, info: str, h):
         self.info = info  # Identificatorul nodului
@@ -137,5 +142,5 @@ class Problema:
 
 
 p = Problema()
-p.citeste("lab2.in")
+p.citeste(os.path.join(__location__, "lab2.in"))
 p.rezolva()

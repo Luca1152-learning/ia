@@ -1,3 +1,8 @@
+import os
+
+__location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+
+
 # Un nod din *arborele de cautare* al jocului
 class Stare:
     ADANCIME_MAX = 9
